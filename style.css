@@ -47,14 +47,15 @@ body.light-theme {
 }
 
 body {
-    background-color: var(--bg-color);
+    background-color: var(--frame-bg); /* App nativo não tem fundo externo */
     color: var(--text-primary);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: stretch; /* Estica o container principal */
     min-height: 100vh;
     min-height: -webkit-fill-available; /* Fix iOS vh bug */
     overflow: hidden;
+    margin: 0;
     transition: background-color var(--transition-speed);
     /* Safe area padding para o body inteiro */
     padding-top: env(safe-area-inset-top);
@@ -62,80 +63,31 @@ body {
     padding-right: env(safe-area-inset-right);
 }
 
-/* Container matching PC wrapper */
+/* Container Principal */
 .app-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
-    padding: 20px;
+    padding: 0; /* Removido o padding externo */
 }
 
-/* Mobile App Frame mockup (desktop preview) */
+/* App Wrapper (ocupa 100% do espaço disponível) */
 .mobile-frame {
     width: 100%;
-    max-width: 410px;
-    height: 820px;
+    max-width: 100%; /* Removido o limite de largura de 410px */
+    height: 100%;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
     background-color: var(--frame-bg);
-    border-radius: 40px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    border: 8px solid #232733;
+    border-radius: 0; /* Sem bordas arredondadas de mockup */
+    border: none; /* Sem borda de aparelho celular */
+    box-shadow: none; /* Sem sombra externa */
     overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
-    transition: background-color var(--transition-speed), border-color var(--transition-speed);
-}
-
-/* =================================================
-   Modo Standalone (PWA instalado no iPhone):
-   Remove o frame de PC e expande para tela cheia
-================================================= */
-@media (display-mode: standalone) {
-    body {
-        padding: 0;
-        background-color: var(--frame-bg);
-    }
-
-    .app-container {
-        padding: 0;
-        align-items: stretch;
-    }
-
-    .mobile-frame {
-        max-width: 100%;
-        width: 100%;
-        height: 100%;
-        min-height: 100vh;
-        min-height: -webkit-fill-available;
-        border-radius: 0;
-        border: none;
-        box-shadow: none;
-    }
-}
-
-/* Fallback para Safari em modo standalone sem @media display-mode */
-@supports (-webkit-touch-callout: none) {
-    body.standalone {
-        padding: 0;
-        background-color: var(--frame-bg);
-    }
-
-    body.standalone .app-container {
-        padding: 0;
-        width: 100vw;
-        height: 100vh;
-        height: -webkit-fill-available;
-    }
-
-    body.standalone .mobile-frame {
-        max-width: 100%;
-        width: 100%;
-        height: 100%;
-        border-radius: 0;
-        border: none;
-        box-shadow: none;
-    }
+    transition: background-color var(--transition-speed);
 }
 
 body.light-theme .mobile-frame {
