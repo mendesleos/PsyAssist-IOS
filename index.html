@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- ============================================================
+         PWA & iOS NATIVE EXPERIENCE
+    ============================================================ -->
+    <!-- Viewport com suporte a Safe Area (notch, cantos arredondados, home bar) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <!-- Habilita o modo app standalone no iOS (sem barra do Safari) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- Barra de status translúcida para o app passar por baixo do notch -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Nome que aparece abaixo do ícone na tela inicial do iPhone -->
+    <meta name="apple-mobile-web-app-title" content="PsyAssist">
+
+    <!-- Ícone que aparece na tela inicial do iPhone (Apple Touch Icon) -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+    <!-- PWA Manifest para Android e browsers modernos -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Theme color da barra do browser (Android Chrome) -->
+    <meta name="theme-color" content="#0e121a">
+
+    <!-- ============================================================
+         SEO BÁSICO
+    ============================================================ -->
+    <title>PsyAssist - Assistente de Psicologia</title>
+    <meta name="description" content="Assistente digital para psicólogos. Gerencie agenda, pacientes e anotações com ajuda de IA.">
+    <meta name="author" content="PsyAssist">
+
+    <!-- ============================================================
+         FONTES E ÍCONES
+    ============================================================ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Main Mobile Mockup Screen -->
+        <div class="mobile-frame">
+            
+            <!-- App Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <span class="date-today" id="current-date">Segunda, 13 de Julho</span>
+                    <h1 class="welcome-text">Bom dia, <span id="dr-name-display">Dr. Bruno</span></h1>
+                </div>
+                <div class="header-right">
+                    <div class="avatar-container">
+                        <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150" alt="Avatar Médico" class="user-avatar" id="avatar-trigger">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Scrollable Content Area -->
+            <main class="app-content" id="app-content">
+                
+                <!-- TAB 3: INÍCIO (Default Screen) -->
+                <section id="tab-inicio" class="tab-section active">
+                    <!-- AI Assistant Card -->
+                    <div class="card ai-card">
+                        <div class="ai-card-header">
+                            <div class="ai-title">
+                                <i class="fa-solid fa-wand-magic-sparkles ai-sparkle"></i>
+                                <span>Assistente de IA</span>
+                            </div>
+                            <span class="ai-status">Pronto</span>
+                        </div>
+                        <p class="ai-desc">Selecione uma função predefinida ou fale diretamente para realizar ações automáticas.</p>
+                        
+                        <!-- Preset Shortcuts -->
+                        <div class="ai-presets">
+                            <button class="preset-btn" onclick="triggerPreset('agendar')">
+                                <i class="fa-regular fa-calendar-plus"></i> Agendar Consulta
+                            </button>
+                            <button class="preset-btn" onclick="triggerPreset('pagamento')">
+                                <i class="fa-solid fa-circle-check"></i> Registrar Pagamento
+                            </button>
+                            <button class="preset-btn" onclick="triggerPreset('cancelar')">
+                                <i class="fa-regular fa-calendar-minus"></i> Cancelar Consulta
+                            </button>
+                        </div>
+
+                        <!-- Chat & Microphone Panel -->
+                        <div class="ai-input-area">
+                            <input type="text" id="ai-text-input" placeholder="Digite seu comando..." autocomplete="off">
+                            <button class="mic-btn" id="voice-btn" title="Segure para falar">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- AI Wave Animation (Hidden by default) -->
+                        <div class="voice-wave-container" id="voice-wave">
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <span class="wave-text">Ouvindo...</span>
+                        </div>
+
+                        <!-- AI Console Logs -->
+                        <div class="ai-feedback" id="ai-feedback-box" style="display: none;">
+                            <div class="feedback-header">
+                                <span class="feedback-title">Ação Executada</span>
+                                <button class="close-feedback-btn" onclick="closeFeedback()">&times;</button>
+                            </div>
+                            <p class="feedback-text" id="ai-feedback-text"></p>
+                        </div>
+                    </div>
+
+                    <!-- Today's Agenda -->
+                    <div class="section-title">
+                        <h2>Próximas Consultas de Hoje</h2>
+                        <span class="badge" id="today-count">0</span>
+                    </div>
+                    <div class="appointments-list" id="today-appointments">
+                        <!-- Dynamic items -->
+                    </div>
+                </section>
+
+                <!-- TAB 1: CALENDÁRIO -->
+                <section id="tab-calendario" class="tab-section">
+                    <div class="calendar-header-controls">
+                        <button class="cal-nav-btn" id="prev-month"><i class="fa-solid fa-chevron-left"></i></button>
+                        <h2 class="calendar-month-year" id="calendar-title">Julho 2026</h2>
+                        <button class="cal-nav-btn" id="next-month"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+
+                    <!-- Modern Interactive Calendar Grid -->
+                    <div class="calendar-card">
+                        <div class="weekdays-grid">
+                            <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                        </div>
+                        <div class="days-grid" id="days-container">
+                            <!-- Dynamic days -->
+                        </div>
+                    </div>
+
+                    <!-- Detail of Selected Day -->
+                    <div class="selected-day-details">
+                        <h3 class="details-title" id="selected-date-label">Consultas em 13/07/2026</h3>
+                        <div class="appointments-list" id="selected-day-appointments">
+                            <!-- Dynamic items -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 2: AGENDAR -->
+                <section id="tab-agendar" class="tab-section">
+                    <div class="form-card">
+                        <h2 class="form-title"><i class="fa-regular fa-calendar-plus"></i> Novo Agendamento</h2>
+                        <form id="appointment-form">
+                            <!-- Patient Selection Method -->
+                            <div class="form-group">
+                                <label>Paciente</label>
+                                <div class="patient-toggle-group">
+                                    <button type="button" class="toggle-btn active" id="btn-select-existing" onclick="setPatientMode('existing')">Existente</button>
+                                    <button type="button" class="toggle-btn" id="btn-create-new" onclick="setPatientMode('new')">Novo Cadastro</button>
+                                </div>
+                            </div>
+
+                            <!-- Existing Patient Selector -->
+                            <div class="form-group" id="group-existing-patient">
+                                <select id="select-patient-id" required>
+                                    <option value="" disabled selected>Escolha um paciente...</option>
+                                    <!-- Dynamic options -->
+                                </select>
+                            </div>
+
+                            <!-- New Patient Form Fields -->
+                            <div class="new-patient-fields" id="group-new-patient" style="display: none;">
+                                <div class="form-group">
+                                    <input type="text" id="new-patient-name" placeholder="Nome Completo">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <input type="number" id="new-patient-age" placeholder="Idade">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" id="new-patient-city" placeholder="Cidade">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <textarea id="new-patient-notes" placeholder="Observações do perfil..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Date and Time -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="appt-date">Data</label>
+                                    <input type="date" id="appt-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="appt-time">Horário</label>
+                                    <input type="time" id="appt-time" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="submit-btn">Agendar e Salvar</button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- TAB 4: PACIENTES -->
+                <section id="tab-pacientes" class="tab-section">
+                    <div class="search-bar-container">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="search-patients" placeholder="Buscar paciente pelo nome...">
+                    </div>
+                    
+                    <div class="patients-list-container" id="patients-list">
+                        <!-- Dynamic patients -->
+                    </div>
+                </section>
+
+                <!-- TAB 5: CONFIGURAÇÕES -->
+                <section id="tab-configuracoes" class="tab-section">
+                    <div class="settings-card">
+                        <h2>Configurações do App</h2>
+                        
+                        <div class="settings-group">
+                            <label class="settings-label">Dados do Profissional</label>
+                            <div class="form-group">
+                                <label for="config-dr-name">Nome de Exibição</label>
+                                <input type="text" id="config-dr-name" value="Dr. Bruno">
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <label class="settings-label">Preferências Visuais</label>
+                            <div class="setting-row">
+                                <span>Tema Escuro</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="theme-toggle" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <label class="settings-label">Banco de Dados</label>
+                            <button class="danger-btn" onclick="resetDatabase()">Restaurar Dados Padrão (Demo)</button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Bottom Navigation Bar (5 Tabs) -->
+            <nav class="bottom-nav">
+                <button class="nav-item" id="nav-calendario" onclick="switchTab('calendario')">
+                    <i class="fa-regular fa-calendar-days"></i>
+                    <span>Agenda</span>
+                </button>
+                <button class="nav-item" id="nav-agendar" onclick="switchTab('agendar')">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Agendar</span>
+                </button>
+                <button class="nav-item active" id="nav-inicio" onclick="switchTab('inicio')">
+                    <div class="center-nav-circle">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+                    <span>Início</span>
+                </button>
+                <button class="nav-item" id="nav-pacientes" onclick="switchTab('pacientes')">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span>Pacientes</span>
+                </button>
+                <button class="nav-item" id="nav-configuracoes" onclick="switchTab('configuracoes')">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Ajustes</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- MODAL: PACIENTE DETALHES -->
+    <div class="modal-overlay" id="patient-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="modal-patient-name">Nome do Paciente</h2>
+                <button class="close-modal-btn" onclick="closePatientModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Patient Profile Box -->
+                <div class="profile-info-box">
+                    <p><strong>Idade:</strong> <span id="modal-patient-age">25</span> anos</p>
+                    <p><strong>Cidade:</strong> <span id="modal-patient-city">São Paulo</span></p>
+                    <p><strong>Observações:</strong> <span id="modal-patient-notes">Anotações básicas aqui...</span></p>
+                </div>
+
+                <!-- Payment Status Toggle -->
+                <div class="payment-status-card">
+                    <span>Status de Pagamento</span>
+                    <button class="payment-toggle-badge paid" id="modal-payment-toggle" onclick="togglePatientPayment()">
+                        Pago
+                    </button>
+                </div>
+
+                <!-- Historical Sessions / Digitalizer OCR Section -->
+                <div class="session-records-header">
+                    <h3>Registro de Anotações Clínicas</h3>
+                    <button class="scan-btn" onclick="triggerNotebookScan()">
+                        <i class="fa-solid fa-camera"></i> Digitalizar Caderno
+                    </button>
+                    <!-- Hidden file inputs to simulate photo upload -->
+                    <input type="file" id="notebook-photo-input" accept="image/*" style="display: none;" onchange="simulateOCR(event)">
+                </div>
+
+                <!-- Scanning Animation Laser (Hidden by default) -->
+                <div class="ocr-scanning-overlay" id="ocr-scanner" style="display: none;">
+                    <div class="laser-beam"></div>
+                    <div class="scanning-text"><i class="fa-solid fa-spinner fa-spin"></i> Digitalizando caderno...</div>
+                </div>
+
+                <!-- Dynamic Notebook entries grouped by date -->
+                <div class="records-timeline" id="patient-records-timeline">
+                    <!-- Filled by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
