@@ -500,6 +500,13 @@ function handleAddAppointment(e) {
     const date = document.getElementById("appt-date").value;
     const time = document.getElementById("appt-time").value;
 
+    // PREVENÇÃO DE CONFLITO DE HORÁRIOS (Double Booking)
+    const conflito = state.appointments.find(a => a.date === date && a.time === time);
+    if (conflito) {
+        alert(`Conflito de horário!\n\nJá existe uma consulta marcada com ${conflito.patientName} às ${time} neste dia.\nPor favor, escolha outro horário.`);
+        return;
+    }
+
     let patientId = "";
     let patientName = "";
 
