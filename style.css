@@ -670,13 +670,40 @@ body.light-theme .cal-day:hover {
     margin-top: 10px;
 }
 
+.details-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
 .details-title {
     font-size: 0.9rem;
     color: var(--text-secondary);
-    margin-bottom: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    margin-bottom: 0;
+}
+
+.calendar-search {
+    margin-bottom: 15px;
+}
+
+#selected-day-appointments {
+    max-height: calc(100vh - 460px); /* Ajuste dinâmico para não quebrar em telas curtas */
+    min-height: 150px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Hide scrollbars for the appointments list too */
+#selected-day-appointments::-webkit-scrollbar {
+    width: 4px;
+}
+#selected-day-appointments::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
 }
 
 /* TAB 2: SCHEDULER FORM */

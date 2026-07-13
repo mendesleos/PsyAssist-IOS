@@ -204,8 +204,11 @@ function setupEventListeners() {
     // Appointment form submit
     document.getElementById("appointment-form").addEventListener("submit", handleAddAppointment);
 
-    // Patient Search bar
+    // Patient Search bar (Pacientes tab)
     document.getElementById("search-patients").addEventListener("input", renderPatientsList);
+
+    // Agenda Search bar (Calendario tab)
+    document.getElementById("search-agenda-input").addEventListener("input", renderSelectedDayAppointments);
 
     // AI Command text input enter key
     document.getElementById("ai-text-input").addEventListener("keypress", (e) => {
@@ -392,13 +395,20 @@ function renderSelectedDayAppointments() {
     dateLabel.textContent = `Consultas em ${formattedDate}`;
 
     const dateStr = formatDateISO(state.selectedDate);
-    const dayAppts = state.appointments.filter(appt => appt.date === dateStr);
+    let dayAppts = state.appointments.filter(appt => appt.date === dateStr);
     
     // Sort by time
     dayAppts.sort((a, b) => a.time.localeCompare(b.time));
 
+    // Filter by search query if any
+    const searchInput = document.getElementById("search-agenda-input");
+    if (searchInput && searchInput.value.trim() !== "") {
+        const query = searchInput.value.toLowerCase().trim();
+        dayAppts = dayAppts.filter(appt => appt.patientName.toLowerCase().includes(query));
+    }
+
     if (dayAppts.length === 0) {
-        container.innerHTML = `<div class="empty-state">Sem consultas marcadas para esta data.</div>`;
+        container.innerHTML = `<div class="empty-state">Nenhuma consulta encontrada.</div>`;
         return;
     }
 
