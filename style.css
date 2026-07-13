@@ -522,9 +522,20 @@ body.light-theme .appt-time-badge {
 .paid-badge {
     font-size: 0.75rem;
     font-weight: 600;
-    padding: 4px 10px;
+    padding: 6px 12px;
     border-radius: 12px;
     text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    user-select: none;
+}
+
+.paid-badge:hover {
+    opacity: 0.85;
+}
+
+.paid-badge:active {
+    transform: scale(0.95);
 }
 
 .paid-badge.paid {

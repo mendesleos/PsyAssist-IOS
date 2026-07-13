@@ -278,6 +278,23 @@ function formatDateBR(dateStr) {
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
 }
 
+// QUICK ACTIONS
+function togglePaymentStatus(patientId, event) {
+    if (event) event.stopPropagation(); // Previne propagação de clique
+
+    const patientIndex = state.patients.findIndex(p => p.id === patientId);
+    if (patientIndex !== -1) {
+        // Toggle the paid status
+        state.patients[patientIndex].paid = !state.patients[patientIndex].paid;
+        saveState();
+        
+        // Update all views that might be showing this patient's badge
+        renderTodayAppointments();
+        renderSelectedDayAppointments();
+        renderPatientsList();
+    }
+}
+
 // TAB 3: INÍCIO VIEW RENDERS
 function renderTodayAppointments() {
     const container = document.getElementById("today-appointments");
@@ -303,7 +320,7 @@ function renderTodayAppointments() {
         
         const item = document.createElement("div");
         item.className = "appointment-item";
-        item.onclick = () => openPatientModalById(appt.patientId);
+        // item.onclick = () => openPatientModalById(appt.patientId); // Removido para simplificar interação
         item.innerHTML = `
             <div class="appt-left">
                 <div class="appt-time-badge">${appt.time}</div>
@@ -313,8 +330,7 @@ function renderTodayAppointments() {
                 </div>
             </div>
             <div class="appt-right">
-                <span class="paid-badge ${paymentClass}">${paymentLabel}</span>
-                <i class="fa-solid fa-chevron-right" style="color: var(--text-secondary); font-size: 0.8rem;"></i>
+                <span class="paid-badge ${paymentClass}" onclick="togglePaymentStatus('${appt.patientId}', event)" title="Alternar Pagamento">${paymentLabel}</span>
             </div>
         `;
         container.appendChild(item);
@@ -419,7 +435,7 @@ function renderSelectedDayAppointments() {
 
         const item = document.createElement("div");
         item.className = "appointment-item";
-        item.onclick = () => openPatientModalById(appt.patientId);
+        // item.onclick = () => openPatientModalById(appt.patientId); // Removido
         item.innerHTML = `
             <div class="appt-left">
                 <div class="appt-time-badge">${appt.time}</div>
@@ -429,8 +445,7 @@ function renderSelectedDayAppointments() {
                 </div>
             </div>
             <div class="appt-right">
-                <span class="paid-badge ${paymentClass}">${paymentLabel}</span>
-                <i class="fa-solid fa-chevron-right" style="color: var(--text-secondary); font-size: 0.8rem;"></i>
+                <span class="paid-badge ${paymentClass}" onclick="togglePaymentStatus('${appt.patientId}', event)" title="Alternar Pagamento">${paymentLabel}</span>
             </div>
         `;
         container.appendChild(item);
