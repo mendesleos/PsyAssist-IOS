@@ -122,6 +122,43 @@ body.light-theme .mobile-frame {
     margin-top: 2px;
 }
 
+.header-left {
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.header-left.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    /* Para não ocupar espaço quando escondido: */
+    display: none; 
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.settings-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.settings-btn:hover {
+    color: var(--text-primary);
+    transform: rotate(45deg);
+}
+
 .avatar-container {
     width: 44px;
     height: 44px;

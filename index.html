@@ -48,14 +48,17 @@
             
             <!-- App Header -->
             <header class="app-header">
-                <div class="header-left">
+                <div class="header-left" id="dynamic-header-left">
                     <span class="date-today" id="current-date">Segunda, 13 de Julho</span>
                     <h1 class="welcome-text">Bom dia, <span id="dr-name-display">Dr. Bruno</span></h1>
                 </div>
                 <div class="header-right">
-                    <div class="avatar-container">
-                        <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150" alt="Avatar Médico" class="user-avatar" id="avatar-trigger">
+                    <div class="avatar-container" id="avatar-trigger">
+                        <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150" alt="Avatar Médico" class="user-avatar">
                     </div>
+                    <button id="settings-btn" class="settings-btn" title="Configurações">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
                 </div>
             </header>
 

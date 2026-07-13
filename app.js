@@ -178,6 +178,11 @@ function setupEventListeners() {
         saveState();
     });
 
+    // Settings Button in Header
+    document.getElementById("settings-btn").addEventListener("click", () => {
+        switchTab("config");
+    });
+
     // Name input change
     document.getElementById("config-dr-name").addEventListener("input", (e) => {
         state.drName = e.target.value || "Dr. Bruno";
@@ -231,6 +236,16 @@ function switchTab(tabId) {
     // Highlight button
     const activeBtn = document.getElementById(`nav-${tabId}`);
     if (activeBtn) activeBtn.classList.add("active");
+
+    // Lógica do Cabeçalho Dinâmico
+    const headerLeft = document.getElementById("dynamic-header-left");
+    if (headerLeft) {
+        if (tabId === "inicio") {
+            headerLeft.classList.remove("hidden");
+        } else {
+            headerLeft.classList.add("hidden");
+        }
+    }
 
     // Perform specific updates per tab
     if (tabId === "calendario") {
