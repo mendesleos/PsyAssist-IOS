@@ -72,10 +72,11 @@ body {
     padding: 0; /* Removido o padding externo */
 }
 
-/* App Wrapper (ocupa 100% do espaço disponível) */
+/* App Wrapper (ocupa 100% do espaço disponível no mobile, e centraliza no PC) */
 .mobile-frame {
     width: 100%;
-    max-width: 100%; /* Removido o limite de largura de 410px */
+    max-width: 768px; /* Restringe no PC para não esticar infinitamente */
+    margin: 0 auto; /* Centraliza na tela do PC */
     height: 100%;
     min-height: 100vh;
     min-height: -webkit-fill-available;
@@ -698,7 +699,35 @@ body.light-theme .cal-day:hover {
 }
 
 .calendar-search {
-    margin-bottom: 15px;
+    position: relative;
+    width: 180px; /* Largura compacta ao lado do título */
+    margin-bottom: 0; /* Remove margem pois está na mesma linha */
+}
+
+.calendar-search i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.calendar-search .search-input {
+    width: 100%;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 8px 12px 8px 32px;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.calendar-search .search-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
 #selected-day-appointments {
