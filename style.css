@@ -138,7 +138,8 @@ body.light-theme .mobile-frame {
 .header-right {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
+    margin-left: auto;
 }
 
 .settings-btn {
