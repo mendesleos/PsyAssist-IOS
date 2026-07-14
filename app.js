@@ -376,6 +376,8 @@ function startGuidedChat(action) {
     // Inicializa a máquina de estados do chat para a ação solicitada
     if (action === 'agendar') {
         initChatFlowAgendar();
+    } else if (action === 'atualizar_consulta') {
+        initChatFlowAtualizarConsulta();
     } else {
         // Mocked para outras ações
         const chatBox = document.getElementById("chat-messages");
@@ -728,6 +730,143 @@ function chatStep_Save() {
         chatAddOptions([
             { label: "📅 Agendar outra consulta", action: () => initChatFlowAgendar() },
             { label: "🏠 Voltar ao início",         action: () => closeGuidedChat() }
+        ]);
+    });
+
+    chatState = {};
+}
+
+// --- Fluxo: Atualizar Consulta ---
+
+function initChatFlowAtualizarConsulta() {
+    const box = document.getElementById("chat-messages");
+    box.innerHTML = "";
+    chatState = {};
+
+    chatAddUserMessage("Atualizar Consulta");
+    chatAddBotMessage("De qual paciente você deseja atualizar as informações da consulta?", 400).then(() => {
+        chatAddSearchInput("Buscar paciente...", (patient) => {
+            chatState.patientId = patient.id;
+            chatState.patientName = patient.name;
+            chatAddUserMessage(patient.name);
+            
+            // Verifica se tem consulta
+            // Para simplificar, pegamos a primeira consulta que encontrar
+            const appt = state.appointments.find(a => a.patientId === patient.id);
+            if (!appt) {
+                chatAddBotMessage(`O paciente **${patient.name}** não possui consultas agendadas no momento.`, 400).then(() => {
+                    chatAddOptions([
+                        { label: "📅 Agendar nova consulta", action: () => initChatFlowAgendar() },
+                        { label: "🏠 Sair", action: () => closeGuidedChat() }
+                    ]);
+                });
+                return;
+            }
+            
+            chatState.apptToUpdate = appt;
+            chatAddBotMessage(`Consulta atual: **${formatDateBR(appt.date)} às ${appt.time}**. O que deseja fazer?`, 400).then(() => {
+                chatAddOptions([
+                    { label: "📅 Mudar dia", action: () => chatStep_Atualizar_MudarDia() },
+                    { label: "⏰ Mudar horário", action: () => chatStep_Atualizar_MudarHorario() }
+                ]);
+            });
+        });
+    });
+}
+
+function chatStep_Atualizar_MudarDia() {
+    chatAddUserMessage("Mudar dia");
+    chatAddBotMessage("Para qual **nova data** você quer mudar?", 400).then(() => {
+        chatAddDateInput((dateStr) => {
+            chatState.newDate = dateStr;
+            chatAddUserMessage(formatDateBR(dateStr));
+            chatStep_Atualizar_ShowSlots(dateStr);
+        });
+    });
+}
+
+function chatStep_Atualizar_MudarHorario() {
+    chatAddUserMessage("Mudar horário");
+    chatState.newDate = chatState.apptToUpdate.date;
+    chatStep_Atualizar_ShowSlots(chatState.newDate);
+}
+
+function chatStep_Atualizar_ShowSlots(dateStr) {
+    const allSlots = [];
+    for (let h = 8; h <= 18; h++) {
+        allSlots.push(`${String(h).padStart(2,"0")}:00`);
+        allSlots.push(`${String(h).padStart(2,"0")}:30`);
+    }
+
+    // Quais já estão ocupados nesse dia? (ignorando a consulta atual do paciente)
+    const taken = state.appointments
+        .filter(a => a.date === dateStr && a.id !== chatState.apptToUpdate.id)
+        .map(a => a.time);
+
+    const freeSlots = allSlots.filter(s => !taken.includes(s));
+
+    if (freeSlots.length === 0) {
+        chatAddBotMessage("😕 Este dia está completamente lotado! Que tal escolher outra data?", 600).then(() => {
+            chatStep_Atualizar_MudarDia();
+        });
+        return;
+    }
+
+    chatAddBotMessage("Aqui estão os **horários disponíveis**. Escolha um novo horário:", 600).then(() => {
+        const box = document.getElementById("chat-messages");
+        const grid = document.createElement("div");
+        grid.className = "chat-slots-grid";
+
+        freeSlots.forEach(slot => {
+            const btn = document.createElement("button");
+            btn.className = "chat-slot-btn";
+            btn.textContent = slot;
+            btn.onclick = () => {
+                grid.querySelectorAll("button").forEach(b => b.disabled = true);
+                grid.style.opacity = "0.5";
+                chatState.newTime = slot;
+                chatAddUserMessage(slot);
+                chatStep_Atualizar_Confirm();
+            };
+            grid.appendChild(btn);
+        });
+
+        box.appendChild(grid);
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+function chatStep_Atualizar_Confirm() {
+    chatAddBotMessage(
+        `Resumo da atualização:\n\n👤 <strong>${chatState.patientName}</strong>\n📅 <strong>${formatDateBR(chatState.newDate)}</strong> às <strong>${chatState.newTime}</strong>\n\nConfirmar nova data/horário?`,
+        600
+    ).then(() => {
+        chatAddOptions([
+            { label: "✅ Confirmar Atualização", action: () => chatStep_Atualizar_Save() },
+            { label: "↩️ Cancelar e sair", action: () => closeGuidedChat() }
+        ]);
+    });
+}
+
+function chatStep_Atualizar_Save() {
+    chatAddUserMessage("Confirmar Atualização");
+
+    const index = state.appointments.findIndex(a => a.id === chatState.apptToUpdate.id);
+    if (index !== -1) {
+        state.appointments[index].date = chatState.newDate;
+        state.appointments[index].time = chatState.newTime;
+        saveState();
+        renderTodayAppointments();
+        renderCalendar();
+    }
+
+    chatAddBotMessage(
+        `🎉 <strong>Consulta atualizada com sucesso!</strong><br><br>` +
+        `O novo horário de ${chatState.patientName} é ${formatDateBR(chatState.newDate)} às ${chatState.newTime}.`,
+        700
+    ).then(() => {
+        chatAddOptions([
+            { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
         ]);
     });
 
