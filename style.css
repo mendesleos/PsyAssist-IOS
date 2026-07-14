@@ -252,8 +252,8 @@ body.light-theme .mobile-frame {
 }
 
 .assistant-actions-grid {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
 
@@ -261,11 +261,13 @@ body.light-theme .mobile-frame {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 16px;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 10px;
     border-radius: 16px;
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 600;
+    text-align: center;
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     border: none;
@@ -277,6 +279,10 @@ body.light-theme .mobile-frame {
 }
 
 .primary-action {
+    grid-column: span 2;
+    flex-direction: row;
+    font-size: 1rem;
+    padding: 18px;
     background: linear-gradient(135deg, var(--accent-color) 0%, #7053e3 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
