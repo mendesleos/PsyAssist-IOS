@@ -350,6 +350,15 @@ function switchTab(tabId) {
         }
     }
 
+    const headerAvatar = document.getElementById("avatar-trigger");
+    if (headerAvatar) {
+        if (tabId === "configuracoes") {
+            headerAvatar.style.display = "none";
+        } else {
+            headerAvatar.style.display = "flex";
+        }
+    }
+
     // Perform specific updates per tab
     if (tabId === "calendario") {
         renderCalendar();
