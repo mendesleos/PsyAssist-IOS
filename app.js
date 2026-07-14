@@ -269,29 +269,354 @@ function closeGuidedChat() {
     document.getElementById("guided-chat-overlay").style.display = "none";
 }
 
-function initChatFlowAgendar() {
-    const chatBox = document.getElementById("chat-messages");
-    chatBox.innerHTML = ""; // Limpa conversas antigas
-    
-    // A simulação começa no próximo chunk...
-    chatBox.innerHTML = `
-        <div class="chat-bubble chat-user">
-            Quero agendar uma consulta.
-        </div>
-        <div class="chat-bubble chat-bot">
-            Com certeza! É para um paciente existente ou um novo cadastro?
-            <div class="chat-options-group">
-                <button class="chat-option-btn" onclick="chatSelectPatientType('existing')">Paciente Existente</button>
-                <button class="chat-option-btn" onclick="chatSelectPatientType('new')">Novo Cadastro</button>
-            </div>
-        </div>
-    `;
+// ============================================================
+// GUIDED CHAT ENGINE - STATE MACHINE
+// ============================================================
+
+// Estado interno do chat
+let chatState = {};
+
+// --- Helpers de UI do Chat ---
+
+function chatAddBotMessage(text, delay = 0) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            const box = document.getElementById("chat-messages");
+            const bubble = document.createElement("div");
+            bubble.className = "chat-bubble chat-bot";
+            bubble.innerHTML = text;
+            box.appendChild(bubble);
+            box.scrollTop = box.scrollHeight;
+            resolve(bubble);
+        }, delay);
+    });
 }
 
-// Temporary stubs so the buttons work right now
-window.chatSelectPatientType = function(type) {
-    alert("Próximo passo: " + type + " (Em desenvolvimento...)");
+function chatAddUserMessage(text) {
+    const box = document.getElementById("chat-messages");
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble chat-user";
+    bubble.textContent = text;
+    box.appendChild(bubble);
+    box.scrollTop = box.scrollHeight;
 }
+
+function chatAddOptions(options) {
+    const box = document.getElementById("chat-messages");
+    const group = document.createElement("div");
+    group.className = "chat-options-group";
+    options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "chat-option-btn";
+        btn.textContent = opt.label;
+        btn.onclick = () => {
+            // Desabilita todos os botões do grupo para evitar clique duplo
+            group.querySelectorAll("button").forEach(b => b.disabled = true);
+            group.style.opacity = "0.5";
+            opt.action();
+        };
+        group.appendChild(btn);
+    });
+    box.appendChild(group);
+    box.scrollTop = box.scrollHeight;
+}
+
+function chatAddSearchInput(placeholder, onSelect) {
+    const box = document.getElementById("chat-messages");
+    const wrapper = document.createElement("div");
+    wrapper.className = "chat-search-wrapper";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = placeholder;
+    input.className = "chat-search-input";
+
+    const results = document.createElement("div");
+    results.className = "chat-search-results";
+
+    input.addEventListener("input", () => {
+        const q = input.value.toLowerCase().trim();
+        results.innerHTML = "";
+        if (!q) return;
+        const matches = state.patients.filter(p => p.name.toLowerCase().includes(q)).slice(0, 5);
+        matches.forEach(p => {
+            const item = document.createElement("div");
+            item.className = "chat-search-result-item";
+            item.textContent = p.name;
+            item.onclick = () => {
+                wrapper.remove();
+                onSelect(p);
+            };
+            results.appendChild(item);
+        });
+    });
+
+    wrapper.appendChild(input);
+    wrapper.appendChild(results);
+    box.appendChild(wrapper);
+    box.scrollTop = box.scrollHeight;
+    setTimeout(() => input.focus(), 300);
+}
+
+function chatAddTextInput(placeholder, type, onConfirm) {
+    const box = document.getElementById("chat-messages");
+    const row = document.createElement("div");
+    row.className = "chat-input-row";
+
+    const input = document.createElement("input");
+    input.type = type || "text";
+    input.placeholder = placeholder;
+    input.autocomplete = "off";
+
+    const btn = document.createElement("button");
+    btn.className = "chat-send-btn";
+    btn.innerHTML = '<i class="fa-solid fa-arrow-right"></i>';
+
+    const submit = () => {
+        const val = input.value.trim();
+        if (!val) return;
+        row.remove();
+        onConfirm(val);
+    };
+
+    btn.onclick = submit;
+    input.addEventListener("keypress", e => { if (e.key === "Enter") submit(); });
+
+    row.appendChild(input);
+    row.appendChild(btn);
+    box.appendChild(row);
+    box.scrollTop = box.scrollHeight;
+    setTimeout(() => input.focus(), 300);
+}
+
+function chatAddDateInput(onConfirm) {
+    const box = document.getElementById("chat-messages");
+    const row = document.createElement("div");
+    row.className = "chat-input-row";
+
+    const input = document.createElement("input");
+    input.type = "date";
+    const today = formatDateISO(new Date());
+    input.min = today;
+    input.value = today;
+
+    const btn = document.createElement("button");
+    btn.className = "chat-send-btn";
+    btn.innerHTML = '<i class="fa-solid fa-arrow-right"></i>';
+
+    const submit = () => {
+        const val = input.value;
+        if (!val) return;
+        row.remove();
+        onConfirm(val);
+    };
+
+    btn.onclick = submit;
+    row.appendChild(input);
+    row.appendChild(btn);
+    box.appendChild(row);
+    box.scrollTop = box.scrollHeight;
+}
+
+// --- Fluxo Principal ---
+
+function initChatFlowAgendar() {
+    const box = document.getElementById("chat-messages");
+    box.innerHTML = "";
+    chatState = {};
+
+    chatAddUserMessage("Quero agendar uma consulta.");
+    chatAddBotMessage("Com certeza! 😊 É para um paciente existente ou vou cadastrar um novo?", 400).then(() => {
+        chatAddOptions([
+            { label: "👤 Paciente Existente", action: () => chatStep_ExistingPatient() },
+            { label: "➕ Novo Cadastro",       action: () => chatStep_NewPatient_Name() }
+        ]);
+    });
+}
+
+// --- Ramo: Paciente Existente ---
+
+function chatStep_ExistingPatient() {
+    chatAddUserMessage("Paciente Existente");
+    chatAddBotMessage("Ok! Digite o nome do paciente para buscar:", 400).then(() => {
+        chatAddSearchInput("Buscar paciente...", (patient) => {
+            chatState.patientId = patient.id;
+            chatState.patientName = patient.name;
+            chatAddUserMessage(patient.name);
+            chatStep_AskDate();
+        });
+    });
+}
+
+// --- Ramo: Novo Paciente ---
+
+function chatStep_NewPatient_Name() {
+    chatAddUserMessage("Novo Cadastro");
+    chatAddBotMessage("Sem problema! Qual o **nome completo** do paciente?", 400).then(() => {
+        chatAddTextInput("Nome completo...", "text", (val) => {
+            chatState.newName = val;
+            chatAddUserMessage(val);
+            chatStep_NewPatient_Age();
+        });
+    });
+}
+
+function chatStep_NewPatient_Age() {
+    chatAddBotMessage("Qual a **idade** dele?", 400).then(() => {
+        chatAddTextInput("Idade...", "number", (val) => {
+            chatState.newAge = parseInt(val) || 0;
+            chatAddUserMessage(val);
+            chatStep_NewPatient_City();
+        });
+    });
+}
+
+function chatStep_NewPatient_City() {
+    chatAddBotMessage("E de qual **cidade**?", 400).then(() => {
+        chatAddTextInput("Cidade...", "text", (val) => {
+            chatState.newCity = val;
+            chatAddUserMessage(val);
+
+            // Salva o novo paciente imediatamente
+            const newId = "p_" + Date.now();
+            const newPatient = {
+                id: newId,
+                name: chatState.newName,
+                age: chatState.newAge,
+                city: chatState.newCity,
+                notes: "",
+                paid: false
+            };
+            state.patients.push(newPatient);
+            saveState();
+
+            chatState.patientId = newId;
+            chatState.patientName = chatState.newName;
+
+            chatAddBotMessage(`✅ **${chatState.newName}** foi cadastrado com sucesso!`, 500).then(() => {
+                chatStep_AskDate();
+            });
+        });
+    });
+}
+
+// --- Etapa Comum: Data e Horário ---
+
+function chatStep_AskDate() {
+    chatAddBotMessage(`Ótimo! Para qual **data** você quer agendar a consulta de **${chatState.patientName}**?`, 600).then(() => {
+        chatAddDateInput((dateStr) => {
+            chatState.date = dateStr;
+            chatAddUserMessage(formatDateBR(dateStr));
+            chatStep_ShowAvailableSlots(dateStr);
+        });
+    });
+}
+
+function chatStep_ShowAvailableSlots(dateStr) {
+    // Todos os horários possíveis das 08h às 19h (intervalos de 30 min)
+    const allSlots = [];
+    for (let h = 8; h <= 18; h++) {
+        allSlots.push(`${String(h).padStart(2,"0")}:00`);
+        allSlots.push(`${String(h).padStart(2,"0")}:30`);
+    }
+
+    // Quais já estão ocupados nesse dia?
+    const taken = state.appointments
+        .filter(a => a.date === dateStr)
+        .map(a => a.time);
+
+    const freeSlots = allSlots.filter(s => !taken.includes(s));
+
+    if (freeSlots.length === 0) {
+        chatAddBotMessage("😕 Este dia está completamente lotado! Que tal escolher outra data?", 600).then(() => {
+            chatStep_AskDate();
+        });
+        return;
+    }
+
+    chatAddBotMessage("Aqui estão os **horários disponíveis**. Escolha um:", 600).then(() => {
+        const box = document.getElementById("chat-messages");
+        const grid = document.createElement("div");
+        grid.className = "chat-slots-grid";
+
+        freeSlots.forEach(slot => {
+            const btn = document.createElement("button");
+            btn.className = "chat-slot-btn";
+            btn.textContent = slot;
+            btn.onclick = () => {
+                grid.querySelectorAll("button").forEach(b => b.disabled = true);
+                grid.style.opacity = "0.5";
+                chatState.time = slot;
+                chatAddUserMessage(slot);
+                chatStep_Confirm();
+            };
+            grid.appendChild(btn);
+        });
+
+        box.appendChild(grid);
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+function chatStep_Confirm() {
+    chatAddBotMessage(
+        `Tudo certo! Resumo do agendamento:\n\n👤 <strong>${chatState.patientName}</strong>\n📅 <strong>${formatDateBR(chatState.date)}</strong> às <strong>${chatState.time}</strong>\n\nConfirmar?`,
+        600
+    ).then(() => {
+        chatAddOptions([
+            {
+                label: "✅ Confirmar Agendamento",
+                action: () => chatStep_Save()
+            },
+            {
+                label: "↩️ Escolher outro horário",
+                action: () => {
+                    chatAddUserMessage("Quero mudar o horário");
+                    chatStep_ShowAvailableSlots(chatState.date);
+                }
+            }
+        ]);
+    });
+}
+
+function chatStep_Save() {
+    chatAddUserMessage("Confirmar Agendamento");
+
+    const newAppt = {
+        id: "a_" + Date.now(),
+        patientId: chatState.patientId,
+        patientName: chatState.patientName,
+        date: chatState.date,
+        time: chatState.time
+    };
+
+    state.appointments.push(newAppt);
+    saveState();
+
+    // Atualiza vistas em segundo plano
+    renderTodayAppointments();
+    renderCalendar();
+
+    chatAddBotMessage(
+        `🎉 <strong>Consulta agendada com sucesso!</strong><br><br>` +
+        `${chatState.patientName} está na agenda para ${formatDateBR(chatState.date)} às ${chatState.time}.<br><br>` +
+        `Posso ajudar com mais alguma coisa?`,
+        700
+    ).then(() => {
+        chatAddOptions([
+            { label: "📅 Agendar outra consulta", action: () => initChatFlowAgendar() },
+            { label: "🏠 Voltar ao início",         action: () => closeGuidedChat() }
+        ]);
+    });
+
+    chatState = {};
+}
+
+// Expõe função global para o HTML
+window.chatSelectPatientType = function(type) {
+    if (type === "existing") chatStep_ExistingPatient();
+    else chatStep_NewPatient_Name();
+};
 
 // FORMAT HELPER FUNCTIONS
 function formatDateISO(date) {
