@@ -1046,6 +1046,11 @@ function handleAddAppointment(e) {
 function renderPatientsList() {
     const container = document.getElementById("patients-list");
     container.innerHTML = "";
+    
+    // Atualiza o contador de pacientes totais (ignora filtro para mostrar o total absoluto)
+    const countEl = document.getElementById("total-patients-count");
+    if (countEl) countEl.textContent = state.patients.length;
+
 
     const query = document.getElementById("search-patients").value.toLowerCase().trim();
 
