@@ -155,11 +155,18 @@ function initApp() {
     document.getElementById("dr-name-display").textContent = state.drName;
     document.getElementById("config-dr-name").value = state.drName;
 
+    // Restore saved avatar if any
+    const savedAvatar = localStorage.getItem("psyassist_avatar");
+    if (savedAvatar) {
+        document.getElementById("profile-avatar-img").src = savedAvatar;
+        document.getElementById("settings-avatar-img").src = savedAvatar;
+    }
+
     const options = { weekday: 'long', day: 'numeric', month: 'long' };
     document.getElementById("current-date").textContent = new Date().toLocaleDateString('pt-BR', options);
 
-    // Update patient dropdown options in Scheduling tab
-    updatePatientDropdown();
+    // Update patient dropdown options in Scheduling tab (mantido por compatibilidade)
+    if (document.getElementById("select-patient-id")) updatePatientDropdown();
     
     // Render views
     renderTodayAppointments();
@@ -178,10 +185,8 @@ function setupEventListeners() {
         saveState();
     });
 
-    // Settings Button in Header
-    document.getElementById("settings-btn").addEventListener("click", () => {
-        switchTab("config");
-    });
+    // Settings Button removed from header - avatar now triggers the tab directly
+
 
     // Name input change
     document.getElementById("config-dr-name").addEventListener("input", (e) => {
@@ -210,6 +215,41 @@ function setupEventListeners() {
     document.getElementById("search-agenda-input").addEventListener("input", renderSelectedDayAppointments);
 
 
+}
+
+// AVATAR / PROFILE PHOTO FUNCTIONS
+function triggerAvatarChange() {
+    // Abre o seletor de fotos nativo do dispositivo
+    document.getElementById("avatar-file-input").click();
+}
+
+function handleAvatarChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Verifica se é uma imagem válida
+    if (!file.type.startsWith("image/")) {
+        alert("Por favor, selecione uma imagem válida.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const dataUrl = e.target.result;
+
+        // Atualiza todas as imagens de avatar no app
+        const headerAvatar = document.getElementById("profile-avatar-img");
+        const settingsAvatar = document.getElementById("settings-avatar-img");
+        if (headerAvatar) headerAvatar.src = dataUrl;
+        if (settingsAvatar) settingsAvatar.src = dataUrl;
+
+        // Salva no localStorage para persistir entre sessões
+        localStorage.setItem("psyassist_avatar", dataUrl);
+    };
+    reader.readAsDataURL(file);
+
+    // Limpa o input para permitir selecionar a mesma foto novamente
+    event.target.value = "";
 }
 
 // Navigation / Tab Switch Router

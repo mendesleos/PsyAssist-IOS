@@ -1042,30 +1042,77 @@ body.light-theme .form-group textarea {
     gap: 12px;
 }
 
-/* TAB 5: SETTINGS */
-.settings-card {
+/* TAB AJUSTES */
+/* Card de Perfil do Médico */
+.settings-profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 24px;
-    padding: 24px;
+    padding: 28px 20px 20px;
+    margin-bottom: 16px;
 }
 
-.settings-card h2 {
-    font-size: 1.15rem;
-    margin-bottom: 20px;
+.settings-avatar-wrapper {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.settings-avatar-img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent-color);
+    display: block;
+}
+
+.settings-avatar-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.settings-avatar-wrapper:hover .settings-avatar-overlay,
+.settings-avatar-wrapper:active .settings-avatar-overlay {
+    opacity: 1;
+}
+
+.settings-avatar-overlay i {
+    color: white;
+    font-size: 1.4rem;
+}
+
+.settings-profile-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.settings-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
 }
 
 .settings-group {
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 16px;
-}
-
-.settings-group:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
     margin-bottom: 0;
-}
 
 .settings-label {
     font-size: 0.8rem;

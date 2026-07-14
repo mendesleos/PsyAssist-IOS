@@ -53,14 +53,14 @@
                     <h1 class="welcome-text">Bom dia, <span id="dr-name-display">Dr. Bruno</span></h1>
                 </div>
                 <div class="header-right">
-                    <div class="avatar-container" id="avatar-trigger">
-                        <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150" alt="Avatar Médico" class="user-avatar">
+                    <!-- Avatar clicável: abre aba de Ajustes -->
+                    <div class="avatar-container" id="avatar-trigger" onclick="switchTab('configuracoes')" title="Ajustes">
+                        <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150" alt="Avatar Médico" class="user-avatar" id="profile-avatar-img">
                     </div>
-                    <button id="settings-btn" class="settings-btn" title="Configurações">
-                        <i class="fa-solid fa-gear"></i>
-                    </button>
                 </div>
             </header>
+            <!-- Input oculto para troca de foto de perfil -->
+            <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleAvatarChange(event)">
 
             <!-- Main Scrollable Content Area -->
             <main class="app-content" id="app-content">
@@ -139,35 +139,51 @@
                     </div>
                 </section>
 
-                <!-- TAB 5: CONFIGURAÇÕES -->
+                <!-- TAB AJUSTES -->
                 <section id="tab-configuracoes" class="tab-section">
-                    <div class="settings-card">
-                        <h2>Configurações do App</h2>
-                        
-                        <div class="settings-group">
-                            <label class="settings-label">Dados do Profissional</label>
+
+                    <!-- Perfil do Médico -->
+                    <div class="settings-profile-card">
+                        <div class="settings-avatar-wrapper" onclick="triggerAvatarChange()">
+                            <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150" alt="Foto de Perfil" class="settings-avatar-img" id="settings-avatar-img">
+                            <div class="settings-avatar-overlay">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                        </div>
+                        <div class="settings-profile-info">
                             <div class="form-group">
-                                <label for="config-dr-name">Nome de Exibição</label>
-                                <input type="text" id="config-dr-name" value="Dr. Bruno">
+                                <label>Nome de Exibição</label>
+                                <input type="text" id="config-dr-name" value="Dr. Bruno" placeholder="Seu nome...">
                             </div>
-                        </div>
-
-                        <div class="settings-group">
-                            <label class="settings-label">Preferências Visuais</label>
-                            <div class="setting-row">
-                                <span>Tema Escuro</span>
-                                <label class="switch">
-                                    <input type="checkbox" id="theme-toggle" checked>
-                                    <span class="slider round"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>Especialidade</label>
+                                <input type="text" id="config-dr-specialty" value="Psicólogo Clínico" placeholder="Sua especialidade...">
                             </div>
-                        </div>
-
-                        <div class="settings-group">
-                            <label class="settings-label">Banco de Dados</label>
-                            <button class="danger-btn" onclick="resetDatabase()">Restaurar Dados Padrão (Demo)</button>
+                            <div class="form-group">
+                                <label>CRP / Registro</label>
+                                <input type="text" id="config-dr-crp" placeholder="Ex: CRP 06/12345">
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Preferências Visuais -->
+                    <div class="settings-card">
+                        <label class="settings-label">Preferências Visuais</label>
+                        <div class="setting-row">
+                            <span>Tema Escuro</span>
+                            <label class="switch">
+                                <input type="checkbox" id="theme-toggle" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Banco de Dados -->
+                    <div class="settings-card">
+                        <label class="settings-label">Banco de Dados</label>
+                        <button class="danger-btn" onclick="resetDatabase()">Restaurar Dados Padrão (Demo)</button>
+                    </div>
+
                 </section>
             </main>
 
@@ -205,7 +221,7 @@
                     <span>Pacientes</span>
                 </button>
                 <button class="nav-item" id="nav-configuracoes" onclick="switchTab('configuracoes')">
-                    <i class="fa-solid fa-sliders"></i>
+                    <i class="fa-solid fa-gear"></i>
                     <span>Ajustes</span>
                 </button>
             </nav>
