@@ -316,6 +316,15 @@ function handleDndToggle(checkbox) {
     }
 }
 
+// TERMS MODAL FUNCTIONS
+function openTermsModal() {
+    document.getElementById("terms-modal").classList.add("active");
+}
+
+function closeTermsModal() {
+    document.getElementById("terms-modal").classList.remove("active");
+}
+
 // Navigation / Tab Switch Router
 function switchTab(tabId) {
     // Hide all sections

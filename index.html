@@ -255,6 +255,72 @@
                         </div>
                     </div>
 
+                    <!-- ④ PRIVACIDADE E SEGURANÇA -->
+                    <div class="settings-section-label">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Privacidade e Segurança</span>
+                    </div>
+
+                    <div class="settings-card">
+                        <label class="settings-label">Transparência</label>
+
+                        <button class="settings-action-btn" onclick="openTermsModal()">
+                            <i class="fa-solid fa-file-contract"></i>
+                            <div class="settings-action-info">
+                                <span>Termos e Privacidade</span>
+                                <small>Leia nossas políticas de uso de dados</small>
+                            </div>
+                            <i class="fa-solid fa-chevron-right settings-action-arrow"></i>
+                        </button>
+
+                        <div class="settings-divider"></div>
+
+                        <button class="settings-action-btn" onclick="alert('As permissões (Câmera, Notificações) podem ser gerenciadas diretamente nos Ajustes do seu celular.')">
+                            <i class="fa-solid fa-lock"></i>
+                            <div class="settings-action-info">
+                                <span>Gerenciar Permissões</span>
+                                <small>Controle o acesso a recursos do sistema</small>
+                            </div>
+                            <i class="fa-solid fa-chevron-right settings-action-arrow"></i>
+                        </button>
+                    </div>
+
+                    <!-- ⑤ SUPORTE, AJUDA E SOBRE -->
+                    <div class="settings-section-label">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span>Suporte e Sobre</span>
+                    </div>
+
+                    <div class="settings-card">
+                        <label class="settings-label">Atendimento</label>
+
+                        <button class="settings-action-btn" onclick="alert('Em breve: Central de ajuda completa com tutoriais e FAQ.')">
+                            <i class="fa-solid fa-headset"></i>
+                            <div class="settings-action-info">
+                                <span>Central de Ajuda / FAQ</span>
+                                <small>Dúvidas frequentes e guias de uso</small>
+                            </div>
+                            <i class="fa-solid fa-chevron-right settings-action-arrow"></i>
+                        </button>
+
+                        <div class="settings-divider"></div>
+
+                        <a href="mailto:suporte@psyassist.com?subject=Feedback/Bug%20Report" class="settings-action-btn" style="text-decoration: none;">
+                            <i class="fa-solid fa-bug"></i>
+                            <div class="settings-action-info">
+                                <span>Reportar Bug ou Sugestão</span>
+                                <small>Fale com nossa equipe de desenvolvimento</small>
+                            </div>
+                            <i class="fa-solid fa-chevron-right settings-action-arrow"></i>
+                        </a>
+                    </div>
+
+                    <div class="app-version-info">
+                        <h3>PsyAssist</h3>
+                        <p>Versão 1.0.0 (Build 2407)</p>
+                        <p>Desenvolvido para profissionais de saúde</p>
+                    </div>
+
                 </section>
             </main>
 
@@ -342,6 +408,26 @@
                 <div class="records-timeline" id="patient-records-timeline">
                     <!-- Filled by JavaScript -->
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TERMOS E PRIVACIDADE -->
+    <div class="modal-overlay" id="terms-modal">
+        <div class="modal-card terms-modal-card">
+            <div class="modal-header">
+                <h2>Termos e Privacidade</h2>
+                <button class="close-modal-btn" onclick="closeTermsModal()">&times;</button>
+            </div>
+            <div class="modal-body terms-body">
+                <h3>1. Coleta de Dados</h3>
+                <p>Nós armazenamos os dados das suas consultas, pacientes e anotações apenas localmente no seu dispositivo. Não enviamos dados sensíveis para nossos servidores sem sua permissão explícita.</p>
+                
+                <h3>2. Uso da Câmera</h3>
+                <p>O aplicativo requer acesso à câmera estritamente para digitalização de documentos e alteração da sua foto de perfil. As imagens processadas são descartadas ou armazenadas localmente.</p>
+                
+                <h3>3. LGPD e Exclusão</h3>
+                <p>Você tem total controle sobre seus dados e pode apagá-los definitivamente através da opção "Excluir Conta" nas configurações.</p>
             </div>
         </div>
     </div>

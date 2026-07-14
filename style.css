@@ -1742,3 +1742,57 @@ body.light-theme .inline-note-editor input {
     border-color: var(--accent-color);
     color: var(--accent-color);
 }
+
+/* App Version Info */
+.app-version-info {
+    text-align: center;
+    margin: 40px 0 20px;
+    opacity: 0.5;
+}
+
+.app-version-info img {
+    width: 40px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+
+.app-version-info h3 {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.app-version-info p {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Terms Modal Specifics */
+.terms-modal-card {
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.terms-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 24px;
+}
+
+.terms-body h3 {
+    font-size: 1rem;
+    color: var(--accent-color);
+    margin: 20px 0 8px;
+}
+
+.terms-body h3:first-child {
+    margin-top: 0;
+}
+
+.terms-body p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
