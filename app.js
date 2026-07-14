@@ -252,6 +252,70 @@ function handleAvatarChange(event) {
     event.target.value = "";
 }
 
+// SETTINGS FUNCTIONS
+
+function handleLogout() {
+    if (confirm("Deseja realmente sair? Seus dados salvos neste dispositivo serão apagados.")) {
+        localStorage.clear();
+        location.reload();
+    }
+}
+
+function handleDeleteAccount() {
+    const first = confirm("⚠️ ATENÇÃO: Esta ação é irreversível!\n\nTodos os seus dados (pacientes, consultas, configurações) serão permanentemente excluídos.\n\nDeseja continuar?");
+    if (!first) return;
+
+    const second = confirm("Última confirmação: tem certeza que deseja excluir sua conta e todos os dados?\n\nEsta ação não pode ser desfeita.");
+    if (!second) return;
+
+    localStorage.clear();
+    location.reload();
+}
+
+function handleNotificationsToggle(checkbox) {
+    if (checkbox.checked) {
+        // Solicita permissão nativa de notificações
+        if ("Notification" in window) {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    new Notification("PsyAssist", {
+                        body: "Notificações ativadas com sucesso! 🎉",
+                        icon: "/icons/icon-192.png"
+                    });
+                    localStorage.setItem("psyassist_notifications", "true");
+                } else {
+                    // Usuário negou — reverte o toggle
+                    checkbox.checked = false;
+                    alert("Permissão negada. Você pode ativar notificações nas configurações do seu dispositivo.");
+                }
+            });
+        } else {
+            checkbox.checked = false;
+            alert("Notificações não são suportadas neste dispositivo.");
+        }
+    } else {
+        localStorage.setItem("psyassist_notifications", "false");
+    }
+}
+
+function handleDndToggle(checkbox) {
+    const isDnd = checkbox.checked;
+    localStorage.setItem("psyassist_dnd", isDnd ? "true" : "false");
+    // Visual feedback
+    if (isDnd) {
+        const msg = document.createElement("div");
+        msg.textContent = "🔕 Modo Não Perturbe ativado";
+        msg.style.cssText = `
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.75); color: white; padding: 10px 18px;
+            border-radius: 20px; font-size: 0.85rem; z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        `;
+        document.body.appendChild(msg);
+        setTimeout(() => msg.remove(), 2500);
+    }
+}
+
 // Navigation / Tab Switch Router
 function switchTab(tabId) {
     // Hide all sections

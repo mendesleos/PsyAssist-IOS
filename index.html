@@ -142,8 +142,14 @@
                 <!-- TAB AJUSTES -->
                 <section id="tab-configuracoes" class="tab-section">
 
-                    <!-- Perfil do Médico -->
+                    <!-- ① GERENCIAMENTO DE CONTA E PERFIL -->
+                    <div class="settings-section-label">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <span>Conta e Perfil</span>
+                    </div>
+
                     <div class="settings-profile-card">
+                        <!-- Foto de Perfil -->
                         <div class="settings-avatar-wrapper" onclick="triggerAvatarChange()">
                             <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150" alt="Foto de Perfil" class="settings-avatar-img" id="settings-avatar-img">
                             <div class="settings-avatar-overlay">
@@ -156,6 +162,10 @@
                                 <input type="text" id="config-dr-name" value="Dr. Bruno" placeholder="Seu nome...">
                             </div>
                             <div class="form-group">
+                                <label>E-mail</label>
+                                <input type="email" id="config-dr-email" placeholder="seu@email.com">
+                            </div>
+                            <div class="form-group">
                                 <label>Especialidade</label>
                                 <input type="text" id="config-dr-specialty" value="Psicólogo Clínico" placeholder="Sua especialidade...">
                             </div>
@@ -166,22 +176,83 @@
                         </div>
                     </div>
 
-                    <!-- Preferências Visuais -->
+                    <!-- Ações da Conta -->
                     <div class="settings-card">
-                        <label class="settings-label">Preferências Visuais</label>
+                        <label class="settings-label">Ações da Conta</label>
+
+                        <button class="settings-action-btn" onclick="handleLogout()">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <div class="settings-action-info">
+                                <span>Logout (Sair)</span>
+                                <small>Encerra a sessão e limpa os dados locais</small>
+                            </div>
+                            <i class="fa-solid fa-chevron-right settings-action-arrow"></i>
+                        </button>
+
+                        <div class="settings-divider"></div>
+
+                        <button class="settings-action-btn danger" onclick="handleDeleteAccount()">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <div class="settings-action-info">
+                                <span>Excluir Conta</span>
+                                <small>Remove todos os seus dados permanentemente</small>
+                            </div>
+                            <i class="fa-solid fa-chevron-right settings-action-arrow"></i>
+                        </button>
+                    </div>
+
+                    <!-- ② NOTIFICAÇÕES -->
+                    <div class="settings-section-label">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>Notificações</span>
+                    </div>
+
+                    <div class="settings-card">
+                        <label class="settings-label">Controle de Avisos</label>
+
                         <div class="setting-row">
-                            <span>Tema Escuro</span>
+                            <div class="setting-row-info">
+                                <span>Notificações do App</span>
+                                <small>Lembretes de consulta e avisos gerais</small>
+                            </div>
                             <label class="switch">
-                                <input type="checkbox" id="theme-toggle" checked>
+                                <input type="checkbox" id="notifications-toggle" onchange="handleNotificationsToggle(this)">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="settings-divider"></div>
+
+                        <div class="setting-row">
+                            <div class="setting-row-info">
+                                <span>Modo Não Perturbe</span>
+                                <small>Pausa todos os avisos temporariamente</small>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="dnd-toggle" onchange="handleDndToggle(this)">
                                 <span class="slider round"></span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Banco de Dados -->
+                    <!-- Preferências Visuais (mantido) -->
+                    <div class="settings-section-label">
+                        <i class="fa-solid fa-palette"></i>
+                        <span>Aparência</span>
+                    </div>
+
                     <div class="settings-card">
-                        <label class="settings-label">Banco de Dados</label>
-                        <button class="danger-btn" onclick="resetDatabase()">Restaurar Dados Padrão (Demo)</button>
+                        <label class="settings-label">Preferências Visuais</label>
+                        <div class="setting-row">
+                            <div class="setting-row-info">
+                                <span>Tema Escuro</span>
+                                <small>Reduz brilho e economiza bateria</small>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="theme-toggle" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
                     </div>
 
                 </section>

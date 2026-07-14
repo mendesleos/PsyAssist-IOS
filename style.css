@@ -1111,6 +1111,112 @@ body.light-theme .form-group textarea {
     margin-bottom: 16px;
 }
 
+/* Seção label tipo cabeçalho de grupo */
+.settings-section-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-secondary);
+    margin: 8px 4px 10px;
+}
+
+.settings-section-label i {
+    color: var(--accent-color);
+    font-size: 0.85rem;
+}
+
+/* Botões de ação tipo linha (Logout, Excluir) */
+.settings-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 6px 0;
+    text-align: left;
+    transition: opacity 0.15s;
+}
+
+.settings-action-btn:active {
+    opacity: 0.6;
+}
+
+.settings-action-btn > i:first-child {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    width: 22px;
+    text-align: center;
+}
+
+.settings-action-btn.danger > i:first-child {
+    color: var(--danger-color);
+}
+
+.settings-action-btn.danger .settings-action-info span {
+    color: var(--danger-color);
+}
+
+.settings-action-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.settings-action-info span {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.settings-action-info small {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+.settings-action-arrow {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+/* Linha divisória interna dos cards */
+.settings-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 14px 0;
+}
+
+/* Setting row com subtítulo */
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.setting-row-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.setting-row-info span {
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.setting-row-info small {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
 .settings-group {
     margin-bottom: 0;
 
