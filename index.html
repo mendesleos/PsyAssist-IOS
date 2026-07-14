@@ -67,55 +67,18 @@
                 
                 <!-- TAB 3: INÍCIO (Default Screen) -->
                 <section id="tab-inicio" class="tab-section active">
-                    <!-- AI Assistant Card -->
-                    <div class="card ai-card">
-                        <div class="ai-card-header">
-                            <div class="ai-title">
-                                <i class="fa-solid fa-wand-magic-sparkles ai-sparkle"></i>
-                                <span>Assistente de IA</span>
-                            </div>
-                            <span class="ai-status">Pronto</span>
-                        </div>
-                        <p class="ai-desc">Selecione uma função predefinida ou fale diretamente para realizar ações automáticas.</p>
-                        
-                        <!-- Preset Shortcuts -->
-                        <div class="ai-presets">
-                            <button class="preset-btn" onclick="triggerPreset('agendar')">
-                                <i class="fa-regular fa-calendar-plus"></i> Agendar Consulta
+                    <!-- Assistant Action Panel -->
+                    <div class="assistant-panel">
+                        <h2>Como posso ajudar hoje?</h2>
+                        <div class="assistant-actions-grid">
+                            <button class="action-btn primary-action" onclick="startGuidedChat('agendar')">
+                                <i class="fa-regular fa-calendar-plus"></i>
+                                <span>Agendar Consulta</span>
                             </button>
-                            <button class="preset-btn" onclick="triggerPreset('pagamento')">
-                                <i class="fa-solid fa-circle-check"></i> Registrar Pagamento
+                            <button class="action-btn secondary-action" onclick="startGuidedChat('pagamento')">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>Registrar Pagamento</span>
                             </button>
-                            <button class="preset-btn" onclick="triggerPreset('cancelar')">
-                                <i class="fa-regular fa-calendar-minus"></i> Cancelar Consulta
-                            </button>
-                        </div>
-
-                        <!-- Chat & Microphone Panel -->
-                        <div class="ai-input-area">
-                            <input type="text" id="ai-text-input" placeholder="Digite seu comando..." autocomplete="off">
-                            <button class="mic-btn" id="voice-btn" title="Segure para falar">
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-                        </div>
-                        
-                        <!-- AI Wave Animation (Hidden by default) -->
-                        <div class="voice-wave-container" id="voice-wave">
-                            <div class="wave-bar"></div>
-                            <div class="wave-bar"></div>
-                            <div class="wave-bar"></div>
-                            <div class="wave-bar"></div>
-                            <div class="wave-bar"></div>
-                            <span class="wave-text">Ouvindo...</span>
-                        </div>
-
-                        <!-- AI Console Logs -->
-                        <div class="ai-feedback" id="ai-feedback-box" style="display: none;">
-                            <div class="feedback-header">
-                                <span class="feedback-title">Ação Executada</span>
-                                <button class="close-feedback-btn" onclick="closeFeedback()">&times;</button>
-                            </div>
-                            <p class="feedback-text" id="ai-feedback-text"></p>
                         </div>
                     </div>
 
@@ -162,62 +125,7 @@
                     </div>
                 </section>
 
-                <!-- TAB 2: AGENDAR -->
-                <section id="tab-agendar" class="tab-section">
-                    <div class="form-card">
-                        <h2 class="form-title"><i class="fa-regular fa-calendar-plus"></i> Novo Agendamento</h2>
-                        <form id="appointment-form">
-                            <!-- Patient Selection Method -->
-                            <div class="form-group">
-                                <label>Paciente</label>
-                                <div class="patient-toggle-group">
-                                    <button type="button" class="toggle-btn active" id="btn-select-existing" onclick="setPatientMode('existing')">Existente</button>
-                                    <button type="button" class="toggle-btn" id="btn-create-new" onclick="setPatientMode('new')">Novo Cadastro</button>
-                                </div>
-                            </div>
 
-                            <!-- Existing Patient Selector -->
-                            <div class="form-group" id="group-existing-patient">
-                                <select id="select-patient-id" required>
-                                    <option value="" disabled selected>Escolha um paciente...</option>
-                                    <!-- Dynamic options -->
-                                </select>
-                            </div>
-
-                            <!-- New Patient Form Fields -->
-                            <div class="new-patient-fields" id="group-new-patient" style="display: none;">
-                                <div class="form-group">
-                                    <input type="text" id="new-patient-name" placeholder="Nome Completo">
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <input type="number" id="new-patient-age" placeholder="Idade">
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="text" id="new-patient-city" placeholder="Cidade">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <textarea id="new-patient-notes" placeholder="Observações do perfil..."></textarea>
-                                </div>
-                            </div>
-
-                            <!-- Date and Time -->
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="appt-date">Data</label>
-                                    <input type="date" id="appt-date" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="appt-time">Horário</label>
-                                    <input type="time" id="appt-time" required>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="submit-btn">Agendar e Salvar</button>
-                        </form>
-                    </div>
-                </section>
 
                 <!-- TAB 4: PACIENTES -->
                 <section id="tab-pacientes" class="tab-section">
@@ -263,16 +171,29 @@
                 </section>
             </main>
 
-            <!-- Bottom Navigation Bar (5 Tabs) -->
+            <!-- Guided Chat UI Overlay -->
+            <div id="guided-chat-overlay" class="chat-overlay" style="display: none;">
+                <div class="chat-header">
+                    <div class="chat-header-info">
+                        <i class="fa-solid fa-robot"></i>
+                        <span>Assistente IA</span>
+                    </div>
+                    <button class="chat-close-btn" onclick="closeGuidedChat()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be injected here by JS -->
+                </div>
+            </div>
+
+            <!-- Bottom Navigation Bar -->
             <nav class="bottom-nav">
                 <button class="nav-item" id="nav-calendario" onclick="switchTab('calendario')">
                     <i class="fa-regular fa-calendar-days"></i>
                     <span>Agenda</span>
                 </button>
-                <button class="nav-item" id="nav-agendar" onclick="switchTab('agendar')">
-                    <i class="fa-regular fa-clock"></i>
-                    <span>Agendar</span>
-                </button>
+
                 <button class="nav-item active" id="nav-inicio" onclick="switchTab('inicio')">
                     <div class="center-nav-circle">
                         <i class="fa-solid fa-house"></i>

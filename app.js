@@ -201,8 +201,7 @@ function setupEventListeners() {
         renderCalendar();
     });
 
-    // Appointment form submit
-    document.getElementById("appointment-form").addEventListener("submit", handleAddAppointment);
+
 
     // Patient Search bar (Pacientes tab)
     document.getElementById("search-patients").addEventListener("input", renderPatientsList);
@@ -210,19 +209,7 @@ function setupEventListeners() {
     // Agenda Search bar (Calendario tab)
     document.getElementById("search-agenda-input").addEventListener("input", renderSelectedDayAppointments);
 
-    // AI Command text input enter key
-    document.getElementById("ai-text-input").addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-            const command = e.target.value.trim();
-            if (command) {
-                processAICommand(command);
-                e.target.value = "";
-            }
-        }
-    });
 
-    // Voice button trigger
-    setupVoiceRecognition();
 }
 
 // Navigation / Tab Switch Router
@@ -258,6 +245,52 @@ function switchTab(tabId) {
     } else if (tabId === "pacientes") {
         renderPatientsList();
     }
+}
+
+// GUIDED CHAT UI CONTROLS
+function startGuidedChat(action) {
+    document.getElementById("guided-chat-overlay").style.display = "flex";
+    
+    // Inicializa a máquina de estados do chat para a ação solicitada
+    if (action === 'agendar') {
+        initChatFlowAgendar();
+    } else {
+        // Mocked para outras ações
+        const chatBox = document.getElementById("chat-messages");
+        chatBox.innerHTML = `
+            <div class="chat-bubble chat-bot">
+                Ainda estou aprendendo a realizar esta ação ("${action}"). Em breve poderei ajudá-lo com isso!
+            </div>
+        `;
+    }
+}
+
+function closeGuidedChat() {
+    document.getElementById("guided-chat-overlay").style.display = "none";
+}
+
+function initChatFlowAgendar() {
+    const chatBox = document.getElementById("chat-messages");
+    chatBox.innerHTML = ""; // Limpa conversas antigas
+    
+    // A simulação começa no próximo chunk...
+    chatBox.innerHTML = `
+        <div class="chat-bubble chat-user">
+            Quero agendar uma consulta.
+        </div>
+        <div class="chat-bubble chat-bot">
+            Com certeza! É para um paciente existente ou um novo cadastro?
+            <div class="chat-options-group">
+                <button class="chat-option-btn" onclick="chatSelectPatientType('existing')">Paciente Existente</button>
+                <button class="chat-option-btn" onclick="chatSelectPatientType('new')">Novo Cadastro</button>
+            </div>
+        </div>
+    `;
+}
+
+// Temporary stubs so the buttons work right now
+window.chatSelectPatientType = function(type) {
+    alert("Próximo passo: " + type + " (Em desenvolvimento...)");
 }
 
 // FORMAT HELPER FUNCTIONS
