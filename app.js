@@ -479,7 +479,10 @@ function chatAddSearchInput(placeholder, onSelect) {
         const q = input.value.toLowerCase().trim();
         results.innerHTML = "";
         if (!q) return;
-        const matches = state.patients.filter(p => matchSearchQuery(p.name, q)).slice(0, 5);
+        const matches = state.patients
+            .filter(p => matchSearchQuery(p.name, q))
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .slice(0, 5);
         matches.forEach(p => {
             const item = document.createElement("div");
             item.className = "chat-search-result-item";
