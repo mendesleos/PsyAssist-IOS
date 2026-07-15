@@ -897,8 +897,9 @@ function initChatFlowCancelarConsulta() {
             chatState.patientName = patient.name;
             chatAddUserMessage(patient.name);
 
-            const appt = state.appointments.find(a => a.patientId === patient.id);
-            if (!appt) {
+            const appts = state.appointments.filter(a => a.patientId === patient.id);
+
+            if (appts.length === 0) {
                 chatAddBotMessage(`O paciente <strong>${patient.name}</strong> não possui consultas agendadas no momento.`, 400).then(() => {
                     chatAddOptions([
                         { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
@@ -907,19 +908,46 @@ function initChatFlowCancelarConsulta() {
                 return;
             }
 
-            chatState.apptToCancel = appt;
+            if (appts.length === 1) {
+                // Só uma consulta: vai direto para confirmação
+                chatStep_Cancelar_Confirmar(appts[0]);
+                return;
+            }
+
+            // Mais de uma consulta: pede para selecionar
             chatAddBotMessage(
-                `Encontrei a consulta de <strong>${patient.name}</strong>:<br><br>` +
-                `📅 <strong>${formatDateBR(appt.date)}</strong> às <strong>${appt.time}</strong><br><br>` +
-                `⚠️ Tem certeza que deseja <strong>cancelar</strong> esta consulta? Esta ação não pode ser desfeita.`,
-                500
+                `<strong>${patient.name}</strong> possui <strong>${appts.length} consultas agendadas</strong>. Qual delas deseja cancelar?`,
+                400
             ).then(() => {
-                chatAddOptions([
-                    { label: "🗑️ Sim, cancelar consulta", action: () => chatStep_Cancelar_Save() },
-                    { label: "↩️ Não, manter consulta", action: () => closeGuidedChat() }
-                ]);
+                const sortedAppts = [...appts].sort((a, b) => {
+                    if (a.date !== b.date) return a.date.localeCompare(b.date);
+                    return a.time.localeCompare(b.time);
+                });
+
+                chatAddOptions(
+                    sortedAppts.map(appt => ({
+                        label: `📅 ${formatDateBR(appt.date)} às ${appt.time}`,
+                        action: () => chatStep_Cancelar_Confirmar(appt)
+                    }))
+                );
             });
         });
+    });
+}
+
+function chatStep_Cancelar_Confirmar(appt) {
+    chatState.apptToCancel = appt;
+    chatAddUserMessage(`${formatDateBR(appt.date)} às ${appt.time}`);
+    chatAddBotMessage(
+        `Você selecionou a consulta de <strong>${chatState.patientName}</strong>:<br><br>` +
+        `📅 <strong>${formatDateBR(appt.date)}</strong> às <strong>${appt.time}</strong><br><br>` +
+        `⚠️ Tem certeza que deseja <strong>cancelar</strong> esta consulta? Esta ação não pode ser desfeita.`,
+        500
+    ).then(() => {
+        chatAddOptions([
+            { label: "🗑️ Sim, cancelar consulta", action: () => chatStep_Cancelar_Save() },
+            { label: "↩️ Não, manter consulta", action: () => closeGuidedChat() }
+        ]);
     });
 }
 
