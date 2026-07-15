@@ -378,6 +378,14 @@ function startGuidedChat(action) {
         initChatFlowAgendar();
     } else if (action === 'atualizar_consulta') {
         initChatFlowAtualizarConsulta();
+    } else if (action === 'cancelar_consulta') {
+        initChatFlowCancelarConsulta();
+    } else if (action === 'adicionar_paciente') {
+        initChatFlowAdicionarPaciente();
+    } else if (action === 'remover_paciente') {
+        initChatFlowRemoverPaciente();
+    } else if (action === 'pagamento') {
+        initChatFlowPagamento();
     } else {
         // Mocked para outras ações
         const chatBox = document.getElementById("chat-messages");
@@ -866,6 +874,277 @@ function chatStep_Atualizar_Save() {
         700
     ).then(() => {
         chatAddOptions([
+            { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
+        ]);
+    });
+
+    chatState = {};
+}
+
+// ============================================================
+// FLUXO: CANCELAR CONSULTA
+// ============================================================
+
+function initChatFlowCancelarConsulta() {
+    const box = document.getElementById("chat-messages");
+    box.innerHTML = "";
+    chatState = {};
+
+    chatAddUserMessage("Cancelar Consulta");
+    chatAddBotMessage("De qual paciente você deseja cancelar a consulta?", 400).then(() => {
+        chatAddSearchInput("Buscar paciente...", (patient) => {
+            chatState.patientId = patient.id;
+            chatState.patientName = patient.name;
+            chatAddUserMessage(patient.name);
+
+            const appt = state.appointments.find(a => a.patientId === patient.id);
+            if (!appt) {
+                chatAddBotMessage(`O paciente <strong>${patient.name}</strong> não possui consultas agendadas no momento.`, 400).then(() => {
+                    chatAddOptions([
+                        { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
+                    ]);
+                });
+                return;
+            }
+
+            chatState.apptToCancel = appt;
+            chatAddBotMessage(
+                `Encontrei a consulta de <strong>${patient.name}</strong>:<br><br>` +
+                `📅 <strong>${formatDateBR(appt.date)}</strong> às <strong>${appt.time}</strong><br><br>` +
+                `⚠️ Tem certeza que deseja <strong>cancelar</strong> esta consulta? Esta ação não pode ser desfeita.`,
+                500
+            ).then(() => {
+                chatAddOptions([
+                    { label: "🗑️ Sim, cancelar consulta", action: () => chatStep_Cancelar_Save() },
+                    { label: "↩️ Não, manter consulta", action: () => closeGuidedChat() }
+                ]);
+            });
+        });
+    });
+}
+
+function chatStep_Cancelar_Save() {
+    chatAddUserMessage("Sim, cancelar consulta");
+
+    const index = state.appointments.findIndex(a => a.id === chatState.apptToCancel.id);
+    if (index !== -1) {
+        state.appointments.splice(index, 1);
+        saveState();
+        renderTodayAppointments();
+        renderCalendar();
+    }
+
+    chatAddBotMessage(
+        `✅ <strong>Consulta cancelada com sucesso!</strong><br><br>` +
+        `O horário de ${formatDateBR(chatState.apptToCancel.date)} às ${chatState.apptToCancel.time} está novamente disponível na agenda.`,
+        700
+    ).then(() => {
+        chatAddOptions([
+            { label: "📅 Agendar nova consulta", action: () => initChatFlowAgendar() },
+            { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
+        ]);
+    });
+
+    chatState = {};
+}
+
+// ============================================================
+// FLUXO: ADICIONAR PACIENTE
+// ============================================================
+
+function initChatFlowAdicionarPaciente() {
+    const box = document.getElementById("chat-messages");
+    box.innerHTML = "";
+    chatState = {};
+
+    chatAddUserMessage("Adicionar Paciente");
+    chatAddBotMessage("Vamos cadastrar um novo paciente! Qual o <strong>nome completo</strong> dele?", 400).then(() => {
+        chatAddTextInput("Nome completo...", "text", (val) => {
+            chatState.newName = val;
+            chatAddUserMessage(val);
+            chatStep_AddPaciente_Age();
+        });
+    });
+}
+
+function chatStep_AddPaciente_Age() {
+    chatAddBotMessage("Qual a <strong>idade</strong> dele?", 400).then(() => {
+        chatAddTextInput("Idade...", "number", (val) => {
+            chatState.newAge = parseInt(val) || 0;
+            chatAddUserMessage(val);
+            chatStep_AddPaciente_City();
+        });
+    });
+}
+
+function chatStep_AddPaciente_City() {
+    chatAddBotMessage("E de qual <strong>cidade</strong>?", 400).then(() => {
+        chatAddTextInput("Cidade...", "text", (val) => {
+            chatState.newCity = val;
+            chatAddUserMessage(val);
+
+            // Salva o novo paciente
+            const newId = "p_" + Date.now();
+            const newPatient = {
+                id: newId,
+                name: chatState.newName,
+                age: chatState.newAge,
+                city: chatState.newCity,
+                notes: "",
+                paid: false
+            };
+            state.patients.push(newPatient);
+            saveState();
+            renderPatientsList();
+
+            chatState.patientId = newId;
+            chatState.patientName = chatState.newName;
+
+            chatAddBotMessage(
+                `🎉 <strong>${chatState.newName}</strong> foi cadastrado com sucesso!<br><br>Deseja agendar uma consulta para ele agora?`,
+                600
+            ).then(() => {
+                chatAddOptions([
+                    {
+                        label: "📅 Sim, agendar consulta",
+                        action: () => {
+                            chatAddUserMessage("Sim, agendar consulta");
+                            chatStep_AskDate();
+                        }
+                    },
+                    { label: "🏠 Não, voltar ao início", action: () => closeGuidedChat() }
+                ]);
+            });
+        });
+    });
+}
+
+// ============================================================
+// FLUXO: REMOVER PACIENTE
+// ============================================================
+
+function initChatFlowRemoverPaciente() {
+    const box = document.getElementById("chat-messages");
+    box.innerHTML = "";
+    chatState = {};
+
+    chatAddUserMessage("Remover Paciente");
+    chatAddBotMessage("Qual paciente você deseja <strong>remover do sistema</strong>?", 400).then(() => {
+        chatAddSearchInput("Buscar paciente...", (patient) => {
+            chatState.patientId = patient.id;
+            chatState.patientName = patient.name;
+            chatAddUserMessage(patient.name);
+
+            const apptCount = state.appointments.filter(a => a.patientId === patient.id).length;
+            const apptWarning = apptCount > 0
+                ? `<br><br>⚠️ Atenção: este paciente possui <strong>${apptCount} consulta(s) agendada(s)</strong> que também serão removidas.`
+                : "";
+
+            chatAddBotMessage(
+                `Você selecionou: <strong>${patient.name}</strong>.${apptWarning}<br><br>` +
+                `Esta ação <strong>não pode ser desfeita</strong>. Deseja prosseguir?`,
+                500
+            ).then(() => {
+                chatAddOptions([
+                    { label: "🗑️ Sim, remover paciente", action: () => chatStep_Remover_Save() },
+                    { label: "↩️ Cancelar", action: () => closeGuidedChat() }
+                ]);
+            });
+        });
+    });
+}
+
+function chatStep_Remover_Save() {
+    chatAddUserMessage("Sim, remover paciente");
+
+    const name = chatState.patientName;
+
+    // Remove consultas do paciente
+    state.appointments = state.appointments.filter(a => a.patientId !== chatState.patientId);
+
+    // Remove paciente
+    state.patients = state.patients.filter(p => p.id !== chatState.patientId);
+
+    saveState();
+    renderTodayAppointments();
+    renderCalendar();
+    renderPatientsList();
+
+    chatAddBotMessage(
+        `✅ <strong>${name}</strong> foi removido do sistema com sucesso.<br><br>` +
+        `Todos os dados e consultas associadas foram apagados.`,
+        700
+    ).then(() => {
+        chatAddOptions([
+            { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
+        ]);
+    });
+
+    chatState = {};
+}
+
+// ============================================================
+// FLUXO: REGISTRAR PAGAMENTO
+// ============================================================
+
+function initChatFlowPagamento() {
+    const box = document.getElementById("chat-messages");
+    box.innerHTML = "";
+    chatState = {};
+
+    chatAddUserMessage("Registrar Pagamento");
+    chatAddBotMessage("De qual paciente você deseja atualizar o status financeiro?", 400).then(() => {
+        chatAddSearchInput("Buscar paciente...", (patient) => {
+            chatState.patientId = patient.id;
+            chatState.patientName = patient.name;
+            chatAddUserMessage(patient.name);
+
+            const currentStatus = patient.paid
+                ? `<span style="color:#4ade80;font-weight:700;">PAGO ✅</span>`
+                : `<span style="color:#f87171;font-weight:700;">PENDENTE ⏳</span>`;
+
+            chatAddBotMessage(
+                `Status atual de <strong>${patient.name}</strong>: ${currentStatus}<br><br>O que deseja fazer?`,
+                500
+            ).then(() => {
+                chatAddOptions([
+                    {
+                        label: "✅ Marcar como PAGO",
+                        action: () => chatStep_Pagamento_Save(true)
+                    },
+                    {
+                        label: "⏳ Marcar como PENDENTE",
+                        action: () => chatStep_Pagamento_Save(false)
+                    }
+                ]);
+            });
+        });
+    });
+}
+
+function chatStep_Pagamento_Save(paidStatus) {
+    const label = paidStatus ? "Marcar como PAGO" : "Marcar como PENDENTE";
+    chatAddUserMessage(label);
+
+    const index = state.patients.findIndex(p => p.id === chatState.patientId);
+    if (index !== -1) {
+        state.patients[index].paid = paidStatus;
+        saveState();
+        renderTodayAppointments();
+        renderSelectedDayAppointments();
+        renderPatientsList();
+    }
+
+    const emoji = paidStatus ? "✅" : "⏳";
+    const statusText = paidStatus ? "PAGO" : "PENDENTE";
+
+    chatAddBotMessage(
+        `${emoji} <strong>Status atualizado!</strong><br><br>` +
+        `${chatState.patientName} agora está marcado como <strong>${statusText}</strong>.`,
+        700
+    ).then(() => {
+        chatAddOptions([
+            { label: "💲 Atualizar outro paciente", action: () => initChatFlowPagamento() },
             { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
         ]);
     });
