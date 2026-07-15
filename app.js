@@ -38,6 +38,15 @@ let state = {
     currentMonthYear: new Date() // Month/Year currently viewed on calendar
 };
 
+// Função utilitária de busca (apenas match no início do nome ou sobrenome)
+function matchSearchQuery(name, query) {
+    if (!name || !query) return false;
+    const n = name.toLowerCase();
+    const q = query.toLowerCase().trim();
+    if (!q) return true;
+    return n.startsWith(q) || n.includes(' ' + q);
+}
+
 // Seed Data
 const DEFAULT_PATIENTS = [
     { id: "p1", name: "Fernando Pessoa", age: 32, city: "Lisboa", notes: "Apresenta estresse pós-trabalho e bloqueio criativo. Foco em arteterapia.", paid: true },
@@ -470,7 +479,7 @@ function chatAddSearchInput(placeholder, onSelect) {
         const q = input.value.toLowerCase().trim();
         results.innerHTML = "";
         if (!q) return;
-        const matches = state.patients.filter(p => p.name.toLowerCase().includes(q)).slice(0, 5);
+        const matches = state.patients.filter(p => matchSearchQuery(p.name, q)).slice(0, 5);
         matches.forEach(p => {
             const item = document.createElement("div");
             item.className = "chat-search-result-item";
@@ -1389,7 +1398,7 @@ function renderSelectedDayAppointments() {
     const searchInput = document.getElementById("search-agenda-input");
     if (searchInput && searchInput.value.trim() !== "") {
         const query = searchInput.value.toLowerCase().trim();
-        dayAppts = dayAppts.filter(appt => appt.patientName.toLowerCase().includes(query));
+        dayAppts = dayAppts.filter(appt => matchSearchQuery(appt.patientName, query));
     }
 
     if (dayAppts.length === 0) {
@@ -1551,7 +1560,7 @@ function renderPatientsList() {
 
     const query = document.getElementById("search-patients").value.toLowerCase().trim();
 
-    const filtered = state.patients.filter(p => p.name.toLowerCase().includes(query));
+    const filtered = state.patients.filter(p => matchSearchQuery(p.name, query));
     // Sort alphabetically
     filtered.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -1926,7 +1935,7 @@ function processAICommand(text) {
     function findPatientByName(nameQuery) {
         if (!nameQuery) return null;
         const query = nameQuery.toLowerCase().trim();
-        return state.patients.find(p => p.name.toLowerCase().includes(query));
+        return state.patients.find(p => matchSearchQuery(p.name, query));
     }
 
     // Split compound commands by connectors "e" or commas ","
@@ -1952,7 +1961,7 @@ function processAICommand(text) {
             // Try to match standard patient names from our state
             let foundPatient = null;
             for (let p of state.patients) {
-                if (cleaned.toLowerCase().includes(p.name.toLowerCase())) {
+                if (matchSearchQuery(cleaned, p.name)) {
                     foundPatient = p;
                     cleaned = cleaned.toLowerCase().replace(p.name.toLowerCase(), "").trim();
                     break;
@@ -1963,7 +1972,7 @@ function processAICommand(text) {
             if (!foundPatient) {
                 for (let p of state.patients) {
                     const firstName = p.name.split(" ")[0].toLowerCase();
-                    if (cleaned.toLowerCase().includes(firstName)) {
+                    if (matchSearchQuery(cleaned, firstName)) {
                         foundPatient = p;
                         cleaned = cleaned.toLowerCase().replace(firstName, "").trim();
                         break;
