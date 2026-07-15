@@ -1127,36 +1127,80 @@ function initChatFlowPagamento() {
             chatState.patientName = patient.name;
             chatAddUserMessage(patient.name);
 
-            const currentStatus = patient.paid
-                ? `<span style="color:#4ade80;font-weight:700;">PAGO ✅</span>`
-                : `<span style="color:#f87171;font-weight:700;">PENDENTE ⏳</span>`;
+            const appts = state.appointments.filter(a => a.patientId === patient.id);
 
+            if (appts.length === 0) {
+                chatAddBotMessage(`<strong>${patient.name}</strong> não possui consultas agendadas. Não há pagamento para registrar.`, 400).then(() => {
+                    chatAddOptions([
+                        { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
+                    ]);
+                });
+                return;
+            }
+
+            if (appts.length === 1) {
+                chatStep_Pagamento_ShowOptions(appts[0]);
+                return;
+            }
+
+            // Mais de uma consulta: pede para selecionar
             chatAddBotMessage(
-                `Status atual de <strong>${patient.name}</strong>: ${currentStatus}<br><br>O que deseja fazer?`,
-                500
+                `<strong>${patient.name}</strong> possui <strong>${appts.length} consultas</strong>. De qual deseja atualizar o pagamento?`,
+                400
             ).then(() => {
-                chatAddOptions([
-                    {
-                        label: "✅ Marcar como PAGO",
-                        action: () => chatStep_Pagamento_Save(true)
-                    },
-                    {
-                        label: "⏳ Marcar como PENDENTE",
-                        action: () => chatStep_Pagamento_Save(false)
-                    }
-                ]);
+                const sorted = [...appts].sort((a, b) => {
+                    if (a.date !== b.date) return a.date.localeCompare(b.date);
+                    return a.time.localeCompare(b.time);
+                });
+                const statusIcon = appt => appt.paid ? "✅" : "⏳";
+                chatAddOptions(
+                    sorted.map(appt => ({
+                        label: `${statusIcon(appt)} ${formatDateBR(appt.date)} às ${appt.time}`,
+                        action: () => {
+                            chatAddUserMessage(`${formatDateBR(appt.date)} às ${appt.time}`);
+                            chatStep_Pagamento_ShowOptions(appt);
+                        }
+                    }))
+                );
             });
         });
     });
 }
 
+function chatStep_Pagamento_ShowOptions(appt) {
+    chatState.apptToUpdate = appt;
+    const isPaid = !!appt.paid;
+    const currentStatus = isPaid
+        ? `<span style="color:#4ade80;font-weight:700;">PAGO ✅</span>`
+        : `<span style="color:#f87171;font-weight:700;">PENDENTE ⏳</span>`;
+
+    chatAddBotMessage(
+        `Consulta de <strong>${formatDateBR(appt.date)} às ${appt.time}</strong><br>Status atual: ${currentStatus}<br><br>O que deseja fazer?`,
+        500
+    ).then(() => {
+        chatAddOptions([
+            {
+                label: isPaid ? "✅ Manter como PAGO" : "✅ Marcar como PAGO",
+                action: () => chatStep_Pagamento_Save(true)
+            },
+            {
+                label: isPaid ? "⏳ Marcar como PENDENTE" : "⏳ Manter como PENDENTE",
+                action: () => chatStep_Pagamento_Save(false)
+            }
+        ]);
+    });
+}
+
 function chatStep_Pagamento_Save(paidStatus) {
-    const label = paidStatus ? "Marcar como PAGO" : "Marcar como PENDENTE";
+    const isPaid = !!chatState.apptToUpdate.paid;
+    const label = paidStatus
+        ? (isPaid ? "Manter como PAGO" : "Marcar como PAGO")
+        : (isPaid ? "Marcar como PENDENTE" : "Manter como PENDENTE");
     chatAddUserMessage(label);
 
-    const index = state.patients.findIndex(p => p.id === chatState.patientId);
+    const index = state.appointments.findIndex(a => a.id === chatState.apptToUpdate.id);
     if (index !== -1) {
-        state.patients[index].paid = paidStatus;
+        state.appointments[index].paid = paidStatus;
         saveState();
         renderTodayAppointments();
         renderSelectedDayAppointments();
@@ -1168,7 +1212,7 @@ function chatStep_Pagamento_Save(paidStatus) {
 
     chatAddBotMessage(
         `${emoji} <strong>Status atualizado!</strong><br><br>` +
-        `${chatState.patientName} agora está marcado como <strong>${statusText}</strong>.`,
+        `Consulta de ${formatDateBR(chatState.apptToUpdate.date)} às ${chatState.apptToUpdate.time} agora está <strong>${statusText}</strong>.`,
         700
     ).then(() => {
         chatAddOptions([
@@ -1205,16 +1249,16 @@ function formatDateBR(dateStr) {
 }
 
 // QUICK ACTIONS
-function togglePaymentStatus(patientId, event) {
+function togglePaymentStatus(apptId, event) {
     if (event) event.stopPropagation(); // Previne propagação de clique
 
-    const patientIndex = state.patients.findIndex(p => p.id === patientId);
-    if (patientIndex !== -1) {
-        // Toggle the paid status
-        state.patients[patientIndex].paid = !state.patients[patientIndex].paid;
+    const apptIndex = state.appointments.findIndex(a => a.id === apptId);
+    if (apptIndex !== -1) {
+        // Toggle the paid status da consulta específica
+        state.appointments[apptIndex].paid = !state.appointments[apptIndex].paid;
         saveState();
         
-        // Update all views that might be showing this patient's badge
+        // Update all views
         renderTodayAppointments();
         renderSelectedDayAppointments();
         renderPatientsList();
@@ -1241,12 +1285,11 @@ function renderTodayAppointments() {
 
     todayAppts.forEach(appt => {
         const patient = state.patients.find(p => p.id === appt.patientId);
-        const paymentClass = (patient && patient.paid) ? "paid" : "unpaid";
-        const paymentLabel = (patient && patient.paid) ? "Pago" : "Pendente";
+        const paymentClass = appt.paid ? "paid" : "unpaid";
+        const paymentLabel = appt.paid ? "Pago" : "Pendente";
         
         const item = document.createElement("div");
         item.className = "appointment-item";
-        // item.onclick = () => openPatientModalById(appt.patientId); // Removido para simplificar interação
         item.innerHTML = `
             <div class="appt-left">
                 <div class="appt-time-badge">${appt.time}</div>
@@ -1256,7 +1299,7 @@ function renderTodayAppointments() {
                 </div>
             </div>
             <div class="appt-right">
-                <span class="paid-badge ${paymentClass}" onclick="togglePaymentStatus('${appt.patientId}', event)" title="Alternar Pagamento">${paymentLabel}</span>
+                <span class="paid-badge ${paymentClass}" onclick="togglePaymentStatus('${appt.id}', event)" title="Alternar Pagamento">${paymentLabel}</span>
             </div>
         `;
         container.appendChild(item);
@@ -1356,12 +1399,11 @@ function renderSelectedDayAppointments() {
 
     dayAppts.forEach(appt => {
         const patient = state.patients.find(p => p.id === appt.patientId);
-        const paymentClass = (patient && patient.paid) ? "paid" : "unpaid";
-        const paymentLabel = (patient && patient.paid) ? "Pago" : "Pendente";
+        const paymentClass = appt.paid ? "paid" : "unpaid";
+        const paymentLabel = appt.paid ? "Pago" : "Pendente";
 
         const item = document.createElement("div");
         item.className = "appointment-item";
-        // item.onclick = () => openPatientModalById(appt.patientId); // Removido
         item.innerHTML = `
             <div class="appt-left">
                 <div class="appt-time-badge">${appt.time}</div>
@@ -1371,7 +1413,7 @@ function renderSelectedDayAppointments() {
                 </div>
             </div>
             <div class="appt-right">
-                <span class="paid-badge ${paymentClass}" onclick="togglePaymentStatus('${appt.patientId}', event)" title="Alternar Pagamento">${paymentLabel}</span>
+                <span class="paid-badge ${paymentClass}" onclick="togglePaymentStatus('${appt.id}', event)" title="Alternar Pagamento">${paymentLabel}</span>
             </div>
         `;
         container.appendChild(item);
@@ -1519,8 +1561,24 @@ function renderPatientsList() {
     }
 
     filtered.forEach(p => {
-        const paymentClass = p.paid ? "paid" : "unpaid";
-        const paymentLabel = p.paid ? "Pago" : "Não Pago";
+        // Status calculado com base nas consultas do paciente
+        const patientAppts = state.appointments.filter(a => a.patientId === p.id);
+        const hasPending = patientAppts.some(a => !a.paid);
+        const hasPaid = patientAppts.some(a => a.paid);
+        let paymentClass, paymentLabel;
+        if (patientAppts.length === 0) {
+            paymentClass = "unpaid";
+            paymentLabel = "Sem consultas";
+        } else if (hasPaid && hasPending) {
+            paymentClass = "partial";
+            paymentLabel = "Parcial";
+        } else if (hasPaid) {
+            paymentClass = "paid";
+            paymentLabel = "Pago";
+        } else {
+            paymentClass = "unpaid";
+            paymentLabel = "Pendente";
+        }
 
         const card = document.createElement("div");
         card.className = "patient-card";
@@ -1553,10 +1611,15 @@ function openPatientModalById(patientId) {
     document.getElementById("modal-patient-city").textContent = patient.city || "Desconhecida";
     document.getElementById("modal-patient-notes").textContent = patient.notes || "Nenhuma observação informada.";
     
-    // Set payment badge status
+    // Set payment badge: calculado das consultas
     const paymentBtn = document.getElementById("modal-payment-toggle");
-    paymentBtn.textContent = patient.paid ? "Pago" : "Pendente";
-    paymentBtn.className = `payment-toggle-badge ${patient.paid ? "paid" : "unpaid"}`;
+    const modalAppts = state.appointments.filter(a => a.patientId === patientId);
+    const modalHasPaid = modalAppts.some(a => a.paid);
+    const modalHasPending = modalAppts.some(a => !a.paid);
+    const modalLabel = modalAppts.length === 0 ? "Sem consultas" : (modalHasPaid && modalHasPending) ? "Parcial" : modalHasPaid ? "Pago" : "Pendente";
+    const modalClass = modalAppts.length === 0 ? "unpaid" : (modalHasPaid && modalHasPending) ? "partial" : modalHasPaid ? "paid" : "unpaid";
+    paymentBtn.textContent = modalLabel;
+    paymentBtn.className = `payment-toggle-badge ${modalClass}`;
 
     // Render historical records
     renderPatientTimeline(patientId);
@@ -1575,18 +1638,7 @@ function closePatientModal() {
 }
 
 function togglePatientPayment() {
-    if (!activeModalPatientId) return;
-
-    const patient = state.patients.find(p => p.id === activeModalPatientId);
-    if (patient) {
-        patient.paid = !patient.paid;
-        saveState();
-
-        // Update modal button state
-        const paymentBtn = document.getElementById("modal-payment-toggle");
-        paymentBtn.textContent = patient.paid ? "Pago" : "Pendente";
-        paymentBtn.className = `payment-toggle-badge ${patient.paid ? "paid" : "unpaid"}`;
-    }
+    // No-op: payment is now per-appointment. Button is informational only.
 }
 
 function renderPatientTimeline(patientId) {
@@ -1992,8 +2044,14 @@ function processAICommand(text) {
             const foundPatient = findPatientByName(cleaned);
 
             if (foundPatient) {
-                foundPatient.paid = true;
-                actionsExecuted.push(`💳 Status de pagamento de <strong>${foundPatient.name}</strong> atualizado para: <strong>Pago</strong>.`);
+                // Marca a consulta mais próxima do paciente como paga
+                const apptToPay = state.appointments.find(a => a.patientId === foundPatient.id);
+                if (apptToPay) {
+                    apptToPay.paid = true;
+                    actionsExecuted.push(`💳 Status de pagamento de <strong>${foundPatient.name}</strong> atualizado para: <strong>Pago</strong>.`);
+                } else {
+                    actionsExecuted.push(`⚠️ <strong>${foundPatient.name}</strong> não possui consultas agendadas para marcar como pago.`);
+                }
             } else {
                 actionsExecuted.push(`⚠️ Não encontrei o paciente "${cleaned}" para marcar como pago.`);
             }
