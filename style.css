@@ -112,7 +112,7 @@ body.light-theme .mobile-frame {
 }
 
 .date-today {
-    font-size: 0.8rem;
+    font-size: 0.65rem;
     color: var(--text-secondary);
     font-weight: 500;
     text-transform: uppercase;

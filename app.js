@@ -174,6 +174,21 @@ function initApp() {
     const options = { weekday: 'long', day: 'numeric', month: 'long' };
     document.getElementById("current-date").textContent = new Date().toLocaleDateString('pt-BR', options);
 
+    const hour = new Date().getHours();
+    let greeting = "";
+    if (hour >= 5 && hour < 12) {
+        greeting = "Bom dia ☀️";
+    } else if (hour >= 12 && hour < 18) {
+        greeting = "Boa tarde 🌇";
+    } else {
+        greeting = "Boa noite 🌙";
+    }
+    
+    const greetingEl = document.getElementById("greeting-text");
+    if (greetingEl) {
+        greetingEl.textContent = greeting;
+    }
+
     // Update patient dropdown options in Scheduling tab (mantido por compatibilidade)
     if (document.getElementById("select-patient-id")) updatePatientDropdown();
     
