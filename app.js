@@ -1589,23 +1589,14 @@ function renderPatientsList() {
     }
 
     filtered.forEach(p => {
-        // Status calculado com base nas consultas do paciente
+        // Conta quantas consultas pendentes o paciente possui
         const patientAppts = state.appointments.filter(a => a.patientId === p.id);
-        const hasPending = patientAppts.some(a => !a.paid);
-        const hasPaid = patientAppts.some(a => a.paid);
-        let paymentClass, paymentLabel;
-        if (patientAppts.length === 0) {
-            paymentClass = "unpaid";
-            paymentLabel = "Sem consultas";
-        } else if (hasPaid && hasPending) {
-            paymentClass = "partial";
-            paymentLabel = "Parcial";
-        } else if (hasPaid) {
-            paymentClass = "paid";
-            paymentLabel = "Pago";
-        } else {
-            paymentClass = "unpaid";
-            paymentLabel = "Pendente";
+        const pendingCount = patientAppts.filter(a => !a.paid).length;
+        
+        let badgeHtml = "";
+        if (pendingCount > 0) {
+            const label = pendingCount === 1 ? "1 Pagamento Pendente" : `${pendingCount} Pagamentos Pendentes`;
+            badgeHtml = `<span class="paid-badge unpaid">${label}</span>`;
         }
 
         const card = document.createElement("div");
@@ -1617,7 +1608,7 @@ function renderPatientsList() {
                 <span>${p.age} anos &bull; ${p.city}</span>
             </div>
             <div class="p-right">
-                <span class="paid-badge ${paymentClass}">${paymentLabel}</span>
+                ${badgeHtml}
                 <i class="fa-solid fa-chevron-right" style="color: var(--text-secondary); font-size: 0.8rem;"></i>
             </div>
         `;
