@@ -1682,7 +1682,8 @@ body.light-theme .timeline-date-group {
     text-transform: uppercase;
 }
 
-.add-note-inline-btn {
+.add-note-inline-btn,
+.delete-note-inline-btn {
     background: none;
     border: none;
     color: var(--text-secondary);
@@ -1700,6 +1701,11 @@ body.light-theme .timeline-date-group {
 .add-note-inline-btn:hover {
     background-color: rgba(255,255,255,0.05);
     color: var(--accent-color);
+}
+
+.delete-note-inline-btn:hover {
+    background-color: rgba(255,255,255,0.05);
+    color: var(--unpaid-color);
 }
 
 .timeline-note-cards {

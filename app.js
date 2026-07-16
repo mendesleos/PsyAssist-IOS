@@ -1738,9 +1738,14 @@ function renderPatientTimeline(patientId) {
         dateGroup.innerHTML = `
             <div class="timeline-date-header">
                 <span class="timeline-date-title">${formattedDate}</span>
-                <button class="add-note-inline-btn" title="Adicionar anotação neste dia" onclick="openInlineNoteEditor('${group.date}')">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="delete-note-inline-btn" title="Excluir esta data" onclick="deleteTimelineDate('${group.date}')">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <button class="add-note-inline-btn" title="Adicionar anotação neste dia" onclick="openInlineNoteEditor('${group.date}')">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
             </div>
             <div class="timeline-note-cards" id="note-cards-${group.date}">
                 <!-- Notes will go here -->
@@ -1844,6 +1849,23 @@ function handleNewTimelineDate(event) {
     localStorage.setItem("psyassist_records", JSON.stringify(records));
     renderPatientTimeline(activeModalPatientId);
     openInlineNoteEditor(dateStr);
+}
+
+function deleteTimelineDate(dateStr) {
+    if (!activeModalPatientId) return;
+    
+    if (!confirm("Tem certeza que deseja excluir as anotações desta data?")) {
+        return;
+    }
+
+    const records = JSON.parse(localStorage.getItem("psyassist_records") || "{}");
+    if (!records[activeModalPatientId]) return;
+
+    // Filtra removendo o grupo selecionado
+    records[activeModalPatientId] = records[activeModalPatientId].filter(g => g.date !== dateStr);
+    
+    localStorage.setItem("psyassist_records", JSON.stringify(records));
+    renderPatientTimeline(activeModalPatientId);
 }
 
 // CEREJA DO BOLO 1: NOTEBOOK OCR SCANNER
