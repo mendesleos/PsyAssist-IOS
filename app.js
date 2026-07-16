@@ -1311,26 +1311,56 @@ function renderTodayAppointments() {
         return;
     }
 
+    const periods = {
+        "Manhã": [],
+        "Tarde": [],
+        "Noite": []
+    };
+
     todayAppts.forEach(appt => {
-        const patient = state.patients.find(p => p.id === appt.patientId);
-        const paymentClass = appt.paid ? "paid" : "unpaid";
-        const paymentLabel = appt.paid ? "Pago" : "Pendente";
+        const timeParts = appt.time.split(":");
+        const hour = parseInt(timeParts[0], 10);
         
-        const item = document.createElement("div");
-        item.className = "appointment-item";
-        item.innerHTML = `
-            <div class="appt-left">
-                <div class="appt-time-badge">${appt.time}</div>
-                <div class="appt-info">
-                    <h4>${appt.patientName}</h4>
-                    <span>${patient ? patient.city : "Sem cidade"}</span>
-                </div>
-            </div>
-            <div class="appt-right">
-                <span class="paid-badge ${paymentClass}" onclick="togglePaymentStatus('${appt.id}', event)" title="Alternar Pagamento">${paymentLabel}</span>
-            </div>
-        `;
-        container.appendChild(item);
+        if (hour >= 5 && hour < 12) {
+            periods["Manhã"].push(appt);
+        } else if (hour >= 12 && hour < 18) {
+            periods["Tarde"].push(appt);
+        } else {
+            periods["Noite"].push(appt);
+        }
+    });
+
+    Object.keys(periods).forEach(periodName => {
+        const periodAppts = periods[periodName];
+        if (periodAppts.length > 0) {
+            // Header do período
+            const header = document.createElement("h3");
+            header.className = "agenda-period-header";
+            header.textContent = periodName;
+            container.appendChild(header);
+
+            periodAppts.forEach(appt => {
+                const patient = state.patients.find(p => p.id === appt.patientId);
+                const paymentClass = appt.paid ? "paid" : "unpaid";
+                const paymentLabel = appt.paid ? "Pago" : "Pendente";
+                
+                const item = document.createElement("div");
+                item.className = "appointment-item";
+                item.innerHTML = `
+                    <div class="appt-left">
+                        <div class="appt-time-badge">${appt.time}</div>
+                        <div class="appt-info">
+                            <h4>${appt.patientName}</h4>
+                            <span>${patient ? patient.city : "Sem cidade"}</span>
+                        </div>
+                    </div>
+                    <div class="appt-right">
+                        <span class="paid-badge ${paymentClass}" onclick="togglePaymentStatus('${appt.id}', event)" title="Alternar Pagamento">${paymentLabel}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
     });
 }
 
