@@ -1795,6 +1795,7 @@ function openPatientModalById(patientId) {
     activeModalPatientId = patientId;
 
     document.getElementById("modal-patient-name").textContent = patient.name;
+    document.getElementById("modal-patient-name-display").textContent = patient.name;
     document.getElementById("modal-patient-age").textContent = patient.age || "-";
     document.getElementById("modal-patient-city").textContent = patient.city || "Desconhecida";
     document.getElementById("modal-patient-notes").textContent = patient.notes || "Nenhuma observação informada.";
@@ -1874,6 +1875,7 @@ function savePatientInfo() {
 
     // Refresh UI
     document.getElementById("modal-patient-name").textContent = patient.name;
+    document.getElementById("modal-patient-name-display").textContent = patient.name;
     document.getElementById("modal-patient-age").textContent = patient.age || "-";
     document.getElementById("modal-patient-city").textContent = patient.city || "Desconhecida";
     document.getElementById("modal-patient-notes").textContent = patient.notes || "Nenhuma observação informada.";
