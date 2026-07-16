@@ -1666,8 +1666,6 @@ function closePatientModal() {
     renderCalendar();
 }
 
-}
-
 function toggleEditPatientInfo() {
     const patient = state.patients.find(p => p.id === activeModalPatientId);
     if (!patient) return;
