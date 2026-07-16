@@ -1765,10 +1765,19 @@ function renderPatientTimeline(patientId) {
 
         // Add note cards under this date group
         const cardsContainer = document.getElementById(`note-cards-${group.date}`);
-        group.notes.forEach(noteText => {
+        group.notes.forEach((noteText, idx) => {
             const card = document.createElement("div");
-            card.className = "note-card";
-            card.innerHTML = `${noteText}`;
+            card.className = "note-card-container";
+            card.innerHTML = `
+                <div class="note-card note-card-display" id="display-${group.date}-${idx}">${noteText}</div>
+                <div class="note-card-edit" id="edit-${group.date}-${idx}" style="display: none;">
+                    <textarea class="edit-note-textarea" id="textarea-${group.date}-${idx}" rows="2">${noteText}</textarea>
+                    <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                        <button class="delete-note-btn" onclick="deleteSingleNote('${group.date}', ${idx})"><i class="fa-solid fa-trash"></i></button>
+                        <button class="inline-note-save" onclick="updateSingleNote('${group.date}', ${idx})">Atualizar</button>
+                    </div>
+                </div>
+            `;
             cardsContainer.appendChild(card);
         });
     });
@@ -1787,13 +1796,66 @@ function renderPatientTimeline(patientId) {
 // INLINE NOTE ACTIONS
 function openInlineNoteEditor(date) {
     const editor = document.getElementById(`editor-${date}`);
-    editor.classList.toggle("active");
-    if (!editor.classList.contains("active")) {
+    const isNowActive = editor.classList.toggle("active");
+    
+    // Toggle notes in this group to edit mode
+    const records = JSON.parse(localStorage.getItem("psyassist_records") || "{}");
+    const group = (records[activeModalPatientId] || []).find(g => g.date === date);
+    if (group && group.notes) {
+        group.notes.forEach((_, idx) => {
+            const displayEl = document.getElementById(`display-${date}-${idx}`);
+            const editEl = document.getElementById(`edit-${date}-${idx}`);
+            if (displayEl && editEl) {
+                if (isNowActive) {
+                    displayEl.style.display = "none";
+                    editEl.style.display = "block";
+                } else {
+                    displayEl.style.display = "block";
+                    editEl.style.display = "none";
+                }
+            }
+        });
+    }
+
+    if (!isNowActive) {
         // Reset states if closing
         const trigger = document.getElementById(`trigger-${date}`);
         const inputRow = document.getElementById(`input-row-${date}`);
         if(trigger) trigger.style.display = "flex";
         if(inputRow) inputRow.style.display = "none";
+    }
+}
+
+function updateSingleNote(date, idx) {
+    if (!activeModalPatientId) return;
+    const records = JSON.parse(localStorage.getItem("psyassist_records") || "{}");
+    const group = (records[activeModalPatientId] || []).find(g => g.date === date);
+    if (group) {
+        const text = document.getElementById(`textarea-${date}-${idx}`).value.trim();
+        if (text) {
+            group.notes[idx] = text;
+            localStorage.setItem("psyassist_records", JSON.stringify(records));
+            renderPatientTimeline(activeModalPatientId);
+            // Re-open editor mode automatically to keep flow smooth
+            openInlineNoteEditor(date);
+        } else {
+            // Se deixar vazio, exclui
+            deleteSingleNote(date, idx);
+        }
+    }
+}
+
+function deleteSingleNote(date, idx) {
+    if (!activeModalPatientId) return;
+    if (!confirm("Excluir esta anotação específica?")) return;
+    
+    const records = JSON.parse(localStorage.getItem("psyassist_records") || "{}");
+    const group = (records[activeModalPatientId] || []).find(g => g.date === date);
+    if (group) {
+        group.notes.splice(idx, 1);
+        localStorage.setItem("psyassist_records", JSON.stringify(records));
+        renderPatientTimeline(activeModalPatientId);
+        openInlineNoteEditor(date);
     }
 }
 

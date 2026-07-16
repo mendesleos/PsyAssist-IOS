@@ -1714,13 +1714,55 @@ body.light-theme .timeline-date-group {
     gap: 8px;
 }
 
+.note-card-container {
+    margin-bottom: 2px;
+}
+
 .note-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 12px 14px;
-    font-size: 0.85rem;
-    line-height: 1.45;
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+.note-card-edit {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.edit-note-textarea {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px;
+    color: var(--text-primary);
+    font-size: 0.88rem;
+    line-height: 1.4;
+    resize: vertical;
+    outline: none;
+}
+
+body.light-theme .edit-note-textarea {
+    background-color: #ffffff;
+}
+
+.delete-note-btn {
+    background: none;
+    border: none;
+    color: var(--unpaid-color);
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: opacity 0.2s;
+}
+
+.delete-note-btn:hover {
+    opacity: 0.8;
 }
 
 .note-card-meta {
