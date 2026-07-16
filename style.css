@@ -1844,3 +1844,8 @@ body.light-theme .inline-note-editor input {
     line-height: 1.5;
     margin-bottom: 12px;
 }
+
+.confirm-modal-card {
+    max-width: 320px;
+    text-align: left;
+}

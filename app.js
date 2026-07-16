@@ -1851,21 +1851,45 @@ function handleNewTimelineDate(event) {
     openInlineNoteEditor(dateStr);
 }
 
+let dateToDelete = null;
+
 function deleteTimelineDate(dateStr) {
     if (!activeModalPatientId) return;
-    
-    if (!confirm("Tem certeza que deseja excluir as anotações desta data?")) {
-        return;
-    }
 
     const records = JSON.parse(localStorage.getItem("psyassist_records") || "{}");
     if (!records[activeModalPatientId]) return;
 
-    // Filtra removendo o grupo selecionado
-    records[activeModalPatientId] = records[activeModalPatientId].filter(g => g.date !== dateStr);
+    const group = records[activeModalPatientId].find(g => g.date === dateStr);
     
-    localStorage.setItem("psyassist_records", JSON.stringify(records));
-    renderPatientTimeline(activeModalPatientId);
+    // Se a data estiver vazia (sem anotações), exclua direto (silenciosamente)
+    if (group && (!group.notes || group.notes.length === 0)) {
+        records[activeModalPatientId] = records[activeModalPatientId].filter(g => g.date !== dateStr);
+        localStorage.setItem("psyassist_records", JSON.stringify(records));
+        renderPatientTimeline(activeModalPatientId);
+        return;
+    }
+
+    // Se tiver anotações, abra o modal
+    dateToDelete = dateStr;
+    document.getElementById("confirm-modal").classList.add("active");
+}
+
+function closeConfirmDeleteModal() {
+    document.getElementById("confirm-modal").classList.remove("active");
+    dateToDelete = null;
+}
+
+function confirmDeleteDate() {
+    if (!activeModalPatientId || !dateToDelete) return;
+
+    const records = JSON.parse(localStorage.getItem("psyassist_records") || "{}");
+    if (records[activeModalPatientId]) {
+        records[activeModalPatientId] = records[activeModalPatientId].filter(g => g.date !== dateToDelete);
+        localStorage.setItem("psyassist_records", JSON.stringify(records));
+        renderPatientTimeline(activeModalPatientId);
+    }
+    
+    closeConfirmDeleteModal();
 }
 
 // CEREJA DO BOLO 1: NOTEBOOK OCR SCANNER
