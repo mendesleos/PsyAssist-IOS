@@ -1039,6 +1039,67 @@ body.light-theme .form-group textarea {
     gap: 10px;
 }
 
+.patients-list-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+    align-items: flex-start;
+}
+
+.list-action-btn {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.list-action-btn:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
+
+.list-action-btn.active {
+    background-color: var(--unpaid-color);
+    border-color: var(--unpaid-color);
+    color: white;
+}
+
+.inline-new-patient-form {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    padding: 16px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeIn 0.2s ease;
+}
+
+.delete-patient-card-btn {
+    background: none;
+    border: none;
+    color: var(--unpaid-color);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px 8px;
+    transition: opacity 0.2s;
+}
+
+.delete-patient-card-btn:hover {
+    opacity: 0.8;
+}
+
 .patient-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);

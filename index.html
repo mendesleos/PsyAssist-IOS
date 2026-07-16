@@ -158,6 +158,28 @@
                     <div class="patients-list-container" id="patients-list">
                         <!-- Dynamic patients -->
                     </div>
+
+                    <!-- Botões de Controle e Formulário Inline -->
+                    <div class="patients-list-actions">
+                        <div style="display: flex; gap: 8px;">
+                            <button class="list-action-btn" onclick="toggleNewPatientInline()" title="Adicionar Paciente">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <button class="list-action-btn" onclick="togglePatientDeleteMode()" title="Excluir Pacientes">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="inline-new-patient-form" id="inline-new-patient-form" style="display: none;">
+                            <input type="text" id="inline-new-name" placeholder="Nome do paciente" class="profile-edit-input">
+                            <div style="display: flex; gap: 8px;">
+                                <input type="number" id="inline-new-age" placeholder="Idade" class="profile-edit-input" style="flex: 1;">
+                                <input type="text" id="inline-new-city" placeholder="Cidade" class="profile-edit-input" style="flex: 2;">
+                            </div>
+                            <textarea id="inline-new-notes" placeholder="Observações iniciais..." class="profile-edit-input" rows="2"></textarea>
+                            <button class="action-btn" style="padding: 10px; font-size: 0.9rem;" onclick="saveNewPatientInline()">Salvar Paciente</button>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- TAB AJUSTES -->
@@ -408,6 +430,7 @@
                         <p><strong>Observações:</strong> <span id="modal-patient-notes">Anotações básicas aqui...</span></p>
                     </div>
                     <div id="patient-info-edit" style="display: none; flex-direction: column; gap: 8px;">
+                        <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Nome</label><input type="text" id="edit-patient-name" class="profile-edit-input"></div>
                         <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Idade</label><input type="number" id="edit-patient-age" class="profile-edit-input"></div>
                         <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Cidade</label><input type="text" id="edit-patient-city" class="profile-edit-input"></div>
                         <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Observações</label><textarea id="edit-patient-notes" class="profile-edit-input" rows="3"></textarea></div>
@@ -463,7 +486,7 @@
             </div>
         </div>
     </div>
-    <!-- Custom Confirm Modal -->
+    <!-- Custom Confirm Modal para Timeline -->
     <div class="modal-overlay" id="confirm-modal">
         <div class="modal-card confirm-modal-card">
             <h3 style="margin-bottom: 12px; color: var(--text-primary);">Atenção</h3>
@@ -471,6 +494,18 @@
             <div style="display: flex; gap: 12px; justify-content: flex-end;">
                 <button class="modal-action-btn-outline" onclick="closeConfirmDeleteModal()">Cancelar</button>
                 <button class="modal-action-btn" style="background-color: var(--unpaid-color);" onclick="confirmDeleteDate()">Sim, Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal para Excluir Paciente -->
+    <div class="modal-overlay" id="patient-confirm-modal">
+        <div class="modal-card confirm-modal-card">
+            <h3 style="margin-bottom: 12px; color: var(--text-primary);">Excluir Paciente</h3>
+            <p style="margin-bottom: 24px; font-size: 0.95rem; line-height: 1.4; color: var(--text-secondary);">Tem certeza que deseja excluir o paciente <strong id="delete-patient-name" style="color: var(--unpaid-color);"></strong> e todo o seu histórico clínico? Esta ação é irreversível.</p>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="modal-action-btn-outline" onclick="closePatientConfirmDeleteModal()">Cancelar</button>
+                <button class="modal-action-btn" style="background-color: var(--unpaid-color);" onclick="confirmDeletePatient()">Sim, Excluir</button>
             </div>
         </div>
     </div>

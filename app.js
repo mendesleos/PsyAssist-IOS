@@ -1659,9 +1659,19 @@ function renderPatientsList() {
             badgeHtml = `<span class="paid-badge unpaid">${label}</span>`;
         }
 
+        let rightActionHtml = `<i class="fa-solid fa-chevron-right" style="color: var(--text-secondary); font-size: 0.8rem;"></i>`;
+        
+        if (isPatientDeleteMode) {
+            rightActionHtml = `<button class="delete-patient-card-btn" onclick="openPatientDeleteConfirm('${p.id}', '${p.name}', event)"><i class="fa-solid fa-xmark"></i></button>`;
+        }
+
         const card = document.createElement("div");
         card.className = "patient-card";
-        card.onclick = () => openPatientModalById(p.id);
+        card.onclick = (e) => {
+            if (!isPatientDeleteMode) {
+                openPatientModalById(p.id);
+            }
+        };
         card.innerHTML = `
             <div class="p-left">
                 <h3>${p.name}</h3>
@@ -1669,11 +1679,108 @@ function renderPatientsList() {
             </div>
             <div class="p-right">
                 ${badgeHtml}
-                <i class="fa-solid fa-chevron-right" style="color: var(--text-secondary); font-size: 0.8rem;"></i>
+                ${rightActionHtml}
             </div>
         `;
         container.appendChild(card);
     });
+}
+
+// ESTADO DE CONTROLE DOS PACIENTES
+let isPatientDeleteMode = false;
+
+function togglePatientDeleteMode() {
+    isPatientDeleteMode = !isPatientDeleteMode;
+    const btn = document.querySelector(".list-action-btn:nth-child(2)");
+    if (isPatientDeleteMode) {
+        btn.classList.add("active");
+    } else {
+        btn.classList.remove("active");
+    }
+    renderPatientsList();
+}
+
+function toggleNewPatientInline() {
+    const form = document.getElementById("inline-new-patient-form");
+    if (form.style.display === "none") {
+        form.style.display = "flex";
+        document.getElementById("inline-new-name").focus();
+    } else {
+        form.style.display = "none";
+    }
+}
+
+function saveNewPatientInline() {
+    const name = document.getElementById("inline-new-name").value.trim();
+    const age = parseInt(document.getElementById("inline-new-age").value) || 0;
+    const city = document.getElementById("inline-new-city").value.trim() || "Desconhecida";
+    const notes = document.getElementById("inline-new-notes").value.trim() || "";
+
+    if (!name) {
+        alert("O nome do paciente é obrigatório!");
+        return;
+    }
+
+    const newPatient = {
+        id: "p_" + Date.now(),
+        name: name,
+        age: age,
+        city: city,
+        notes: notes,
+        paid: false
+    };
+
+    state.patients.push(newPatient);
+    saveState();
+    
+    // Clear fields
+    document.getElementById("inline-new-name").value = "";
+    document.getElementById("inline-new-age").value = "";
+    document.getElementById("inline-new-city").value = "";
+    document.getElementById("inline-new-notes").value = "";
+    
+    // Hide form
+    document.getElementById("inline-new-patient-form").style.display = "none";
+    
+    // Update Dropdown and List
+    updatePatientDropdown();
+    renderPatientsList();
+}
+
+let patientToDelete = null;
+
+function openPatientDeleteConfirm(id, name, event) {
+    event.stopPropagation(); // Evita abrir o perfil
+    patientToDelete = id;
+    document.getElementById("delete-patient-name").textContent = name;
+    document.getElementById("patient-confirm-modal").classList.add("active");
+}
+
+function closePatientConfirmDeleteModal() {
+    patientToDelete = null;
+    document.getElementById("patient-confirm-modal").classList.remove("active");
+}
+
+function confirmDeletePatient() {
+    if (!patientToDelete) return;
+
+    // Remove das consultas
+    state.appointments = state.appointments.filter(a => a.patientId !== patientToDelete);
+    
+    // Remove registros (Timeline)
+    const records = JSON.parse(localStorage.getItem("psyassist_records") || "{}");
+    if (records[patientToDelete]) {
+        delete records[patientToDelete];
+        localStorage.setItem("psyassist_records", JSON.stringify(records));
+    }
+
+    // Remove o paciente
+    state.patients = state.patients.filter(p => p.id !== patientToDelete);
+    
+    saveState();
+    closePatientConfirmDeleteModal();
+    updatePatientDropdown();
+    renderPatientsList();
 }
 
 // MODAL: PACIENTE DETALHES & HISTÓRICO
@@ -1733,6 +1840,7 @@ function toggleEditPatientInfo() {
     document.getElementById("patient-info-display").style.display = "none";
     document.getElementById("patient-info-edit").style.display = "flex";
     
+    document.getElementById("edit-patient-name").value = patient.name || "";
     document.getElementById("edit-patient-age").value = patient.age || "";
     document.getElementById("edit-patient-city").value = patient.city || "";
     document.getElementById("edit-patient-notes").value = patient.notes || "";
@@ -1746,6 +1854,7 @@ function savePatientInfo() {
     const patient = state.patients.find(p => p.id === activeModalPatientId);
     if (!patient) return;
 
+    patient.name = document.getElementById("edit-patient-name").value.trim() || patient.name;
     patient.age = parseInt(document.getElementById("edit-patient-age").value) || null;
     patient.city = document.getElementById("edit-patient-city").value.trim();
     patient.notes = document.getElementById("edit-patient-notes").value.trim();
@@ -1753,12 +1862,15 @@ function savePatientInfo() {
     // Update DEFAULT_PATIENTS as well (since we don't have a backend)
     const defaultPatient = DEFAULT_PATIENTS.find(p => p.id === patient.id);
     if (defaultPatient) {
+        defaultPatient.name = patient.name;
         defaultPatient.age = patient.age;
         defaultPatient.city = patient.city;
         defaultPatient.notes = patient.notes;
     }
+    saveState();
 
     // Refresh UI
+    document.getElementById("modal-patient-name").textContent = patient.name;
     document.getElementById("modal-patient-age").textContent = patient.age || "-";
     document.getElementById("modal-patient-city").textContent = patient.city || "Desconhecida";
     document.getElementById("modal-patient-notes").textContent = patient.notes || "Nenhuma observação informada.";
