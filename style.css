@@ -14,7 +14,7 @@
     --success-color: #38bdf8;
     --danger-color: #f87171;
     --paid-color: #34d399;
-    --unpaid-color: #fb7185;
+    --unpaid-color: #fbbf24;
     
     /* Layout Variables */
     --nav-height: 72px;
@@ -35,7 +35,7 @@ body.light-theme {
     --success-color: #0ea5e9;
     --danger-color: #ef4444;
     --paid-color: #10b981;
-    --unpaid-color: #f43f5e;
+    --unpaid-color: #f59e0b;
 }
 
 * {
