@@ -1741,6 +1741,30 @@ body.light-theme .timeline-date-group {
     display: flex;
 }
 
+.add-note-trigger-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    color: var(--accent-color);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    width: fit-content;
+}
+
+.add-note-trigger-btn:hover {
+    background-color: rgba(144, 126, 255, 0.1);
+}
+
+.note-input-row {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
 .inline-note-editor input {
     flex: 1;
     background-color: rgba(0, 0, 0, 0.1);

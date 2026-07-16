@@ -1742,8 +1742,8 @@ function renderPatientTimeline(patientId) {
                     <button class="delete-note-inline-btn" title="Excluir esta data" onclick="deleteTimelineDate('${group.date}')">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    <button class="add-note-inline-btn" title="Adicionar anotação neste dia" onclick="openInlineNoteEditor('${group.date}')">
-                        <i class="fa-solid fa-plus"></i>
+                    <button class="add-note-inline-btn" title="Editar anotações neste dia" onclick="openInlineNoteEditor('${group.date}')">
+                        <i class="fa-solid fa-pen"></i>
                     </button>
                 </div>
             </div>
@@ -1752,8 +1752,13 @@ function renderPatientTimeline(patientId) {
             </div>
             <!-- Inline Note Editor (Hidden initially) -->
             <div class="inline-note-editor" id="editor-${group.date}">
-                <input type="text" placeholder="Escreva a anotação..." id="input-${group.date}">
-                <button class="inline-note-save" onclick="saveInlineNote('${group.date}')">Salvar</button>
+                <div class="add-note-trigger-btn" id="trigger-${group.date}" onclick="showNoteInput('${group.date}')">
+                    <i class="fa-solid fa-plus"></i> Adicionar anotação
+                </div>
+                <div class="note-input-row" id="input-row-${group.date}" style="display: none;">
+                    <input type="text" placeholder="Escreva a anotação..." id="input-${group.date}">
+                    <button class="inline-note-save" onclick="saveInlineNote('${group.date}')">Salvar</button>
+                </div>
             </div>
         `;
         container.appendChild(dateGroup);
@@ -1783,9 +1788,20 @@ function renderPatientTimeline(patientId) {
 function openInlineNoteEditor(date) {
     const editor = document.getElementById(`editor-${date}`);
     editor.classList.toggle("active");
-    if (editor.classList.contains("active")) {
-        document.getElementById(`input-${date}`).focus();
+    if (!editor.classList.contains("active")) {
+        // Reset states if closing
+        const trigger = document.getElementById(`trigger-${date}`);
+        const inputRow = document.getElementById(`input-row-${date}`);
+        if(trigger) trigger.style.display = "flex";
+        if(inputRow) inputRow.style.display = "none";
     }
+}
+
+function showNoteInput(date) {
+    document.getElementById(`trigger-${date}`).style.display = "none";
+    const inputRow = document.getElementById(`input-row-${date}`);
+    inputRow.style.display = "flex";
+    document.getElementById(`input-${date}`).focus();
 }
 
 function saveInlineNote(date) {
