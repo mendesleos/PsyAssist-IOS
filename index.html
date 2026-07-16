@@ -514,6 +514,45 @@
         </div>
     </div>
 
+    <!-- Modal de Gerenciamento de Consulta -->
+    <div class="modal-overlay" id="appointment-action-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="appt-modal-patient-name">Nome do Paciente</h2>
+                <button class="close-modal-btn" onclick="closeAppointmentModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.8rem; color: var(--text-secondary);">Data</label>
+                        <input type="date" id="appt-modal-date" class="profile-edit-input" style="width: 100%;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.8rem; color: var(--text-secondary);">Horário</label>
+                        <input type="time" id="appt-modal-time" class="profile-edit-input" style="width: 100%;">
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                    <button class="action-btn" style="background-color: var(--accent-color); color: white;" onclick="saveAppointmentEdits()">Salvar Alterações</button>
+                    <button class="action-btn-outline" style="color: var(--danger-color); border-color: var(--danger-color);" onclick="openAppointmentDeleteConfirm()">Excluir Consulta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal para Excluir Consulta -->
+    <div class="modal-overlay" id="appt-confirm-modal">
+        <div class="modal-card confirm-modal-card">
+            <h3 style="margin-bottom: 12px; color: var(--text-primary);">Atenção</h3>
+            <p style="margin-bottom: 24px; font-size: 0.95rem; line-height: 1.4; color: var(--text-secondary);">Tem certeza que deseja <strong style="color: var(--danger-color);">EXCLUIR</strong> esta consulta de forma permanente?</p>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="modal-action-btn-outline" onclick="closeAppointmentDeleteConfirm()">Cancelar</button>
+                <button class="modal-action-btn" style="background-color: var(--danger-color);" onclick="confirmDeleteAppointment()">Sim, Excluir</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="app.js"></script>
 </body>

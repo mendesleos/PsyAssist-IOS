@@ -1346,6 +1346,7 @@ function renderTodayAppointments() {
                 
                 const item = document.createElement("div");
                 item.className = "appointment-item";
+                item.onclick = () => openAppointmentModal(appt.id);
                 item.innerHTML = `
                     <div class="appt-left">
                         <div class="appt-time-badge">${appt.time}</div>
@@ -1490,6 +1491,7 @@ function renderSelectedDayAppointments() {
 
                 const item = document.createElement("div");
                 item.className = "appointment-item";
+                item.onclick = () => openAppointmentModal(appt.id);
                 item.innerHTML = `
                     <div class="appt-left">
                         <div class="appt-time-badge">${appt.time}</div>
@@ -1788,6 +1790,76 @@ function confirmDeletePatient() {
 // MODAL: PACIENTE DETALHES & HISTÓRICO
 let activeModalPatientId = "";
 
+// ==========================================
+// CONTROLE DO MODAL DE CONSULTAS
+// ==========================================
+let activeAppointmentId = null;
+
+function openAppointmentModal(apptId) {
+    const appt = state.appointments.find(a => a.id === apptId);
+    if (!appt) return;
+    
+    activeAppointmentId = apptId;
+    document.getElementById("appt-modal-patient-name").textContent = appt.patientName;
+    document.getElementById("appt-modal-date").value = appt.date;
+    document.getElementById("appt-modal-time").value = appt.time;
+    
+    document.getElementById("appointment-action-modal").classList.add("active");
+}
+
+function closeAppointmentModal() {
+    activeAppointmentId = null;
+    document.getElementById("appointment-action-modal").classList.remove("active");
+}
+
+function saveAppointmentEdits() {
+    if (!activeAppointmentId) return;
+    
+    const appt = state.appointments.find(a => a.id === activeAppointmentId);
+    if (!appt) return;
+    
+    const newDate = document.getElementById("appt-modal-date").value;
+    const newTime = document.getElementById("appt-modal-time").value;
+    
+    if (!newDate || !newTime) {
+        alert("Preencha data e horário válidos.");
+        return;
+    }
+    
+    appt.date = newDate;
+    appt.time = newTime;
+    
+    saveState();
+    closeAppointmentModal();
+    
+    // Refresh screens
+    renderTodayAppointments();
+    renderSelectedDayAppointments();
+    renderCalendar();
+}
+
+function openAppointmentDeleteConfirm() {
+    document.getElementById("appt-confirm-modal").classList.add("active");
+}
+
+function closeAppointmentDeleteConfirm() {
+    document.getElementById("appt-confirm-modal").classList.remove("active");
+}
+
+function confirmDeleteAppointment() {
+    if (!activeAppointmentId) return;
+    
+    state.appointments = state.appointments.filter(a => a.id !== activeAppointmentId);
+    saveState();
+    
+    closeAppointmentDeleteConfirm();
+    closeAppointmentModal();
+    
+    // Refresh screens
+    renderTodayAppointments();
+    renderSelectedDayAppointments();
+    renderCalendar();
+}
 function openPatientModalById(patientId) {
     const patient = state.patients.find(p => p.id === patientId);
     if (!patient) return;

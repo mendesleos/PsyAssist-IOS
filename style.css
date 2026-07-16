@@ -592,10 +592,15 @@ body.light-theme .chat-slot-btn {
     align-items: center;
     justify-content: space-between;
     transition: transform 0.2s;
+    cursor: pointer;
 }
 
 .appointment-item:hover {
     transform: translateY(-2px);
+}
+
+.appointment-item:active {
+    transform: scale(0.98);
 }
 
 .appt-left {
