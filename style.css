@@ -569,6 +569,20 @@ body.light-theme .chat-slot-btn {
     gap: 12px;
 }
 
+.agenda-period-header {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 16px;
+    margin-bottom: 4px;
+    padding-left: 4px;
+}
+
+.appointments-list .agenda-period-header:first-child {
+    margin-top: 4px;
+}
+
 .appointment-item {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
