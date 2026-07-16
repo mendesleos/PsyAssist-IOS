@@ -173,7 +173,7 @@
                         <div class="inline-new-patient-form" id="inline-new-patient-form" style="display: none;">
                             <input type="text" id="inline-new-name" placeholder="Nome do paciente" class="profile-edit-input">
                             <div style="display: flex; gap: 8px;">
-                                <input type="number" id="inline-new-age" placeholder="Idade" class="profile-edit-input" style="flex: 1;">
+                                <input type="number" id="inline-new-age" placeholder="Idade" class="profile-edit-input" style="flex: 1;" min="0" oninput="this.value = Math.abs(this.value)">
                                 <input type="text" id="inline-new-city" placeholder="Cidade" class="profile-edit-input" style="flex: 2;">
                             </div>
                             <textarea id="inline-new-notes" placeholder="Observações iniciais..." class="profile-edit-input" rows="2"></textarea>
@@ -431,7 +431,7 @@
                     </div>
                     <div id="patient-info-edit" style="display: none; flex-direction: column; gap: 8px;">
                         <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Nome</label><input type="text" id="edit-patient-name" class="profile-edit-input"></div>
-                        <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Idade</label><input type="number" id="edit-patient-age" class="profile-edit-input"></div>
+                        <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Idade</label><input type="number" id="edit-patient-age" class="profile-edit-input" min="0" oninput="this.value = Math.abs(this.value)"></div>
                         <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Cidade</label><input type="text" id="edit-patient-city" class="profile-edit-input"></div>
                         <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Observações</label><textarea id="edit-patient-notes" class="profile-edit-input" rows="3"></textarea></div>
                     </div>

@@ -1568,7 +1568,8 @@ function handleAddAppointment(e) {
 
     if (isNew) {
         const name = document.getElementById("new-patient-name").value.trim();
-        const age = parseInt(document.getElementById("new-patient-age").value) || 0;
+        let age = parseInt(document.getElementById("new-patient-age").value);
+        age = isNaN(age) ? 0 : Math.max(0, age);
         const city = document.getElementById("new-patient-city").value.trim() || "Desconhecida";
         const notes = document.getElementById("new-patient-notes").value.trim() || "";
 
@@ -1712,7 +1713,8 @@ function toggleNewPatientInline() {
 
 function saveNewPatientInline() {
     const name = document.getElementById("inline-new-name").value.trim();
-    const age = parseInt(document.getElementById("inline-new-age").value) || 0;
+    let age = parseInt(document.getElementById("inline-new-age").value);
+    age = isNaN(age) ? 0 : Math.max(0, age);
     const city = document.getElementById("inline-new-city").value.trim() || "Desconhecida";
     const notes = document.getElementById("inline-new-notes").value.trim() || "";
 
@@ -1855,7 +1857,8 @@ function savePatientInfo() {
     if (!patient) return;
 
     patient.name = document.getElementById("edit-patient-name").value.trim() || patient.name;
-    patient.age = parseInt(document.getElementById("edit-patient-age").value) || null;
+    let age = parseInt(document.getElementById("edit-patient-age").value);
+    patient.age = isNaN(age) ? null : Math.max(0, age);
     patient.city = document.getElementById("edit-patient-city").value.trim();
     patient.notes = document.getElementById("edit-patient-notes").value.trim();
 
