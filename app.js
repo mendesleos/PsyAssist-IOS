@@ -1629,16 +1629,26 @@ function openPatientModalById(patientId) {
     document.getElementById("modal-patient-age").textContent = patient.age || "-";
     document.getElementById("modal-patient-city").textContent = patient.city || "Desconhecida";
     document.getElementById("modal-patient-notes").textContent = patient.notes || "Nenhuma observação informada.";
-    
-    // Set payment badge: calculado das consultas
-    const paymentBtn = document.getElementById("modal-payment-toggle");
+    // Reset edit mode if open
+    document.getElementById("patient-info-display").style.display = "block";
+    document.getElementById("patient-info-edit").style.display = "none";
+    const editBtn = document.getElementById("edit-patient-btn");
+    editBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Editar';
+    editBtn.onclick = toggleEditPatientInfo;
+
+    // Set payment pending list
     const modalAppts = state.appointments.filter(a => a.patientId === patientId);
-    const modalHasPaid = modalAppts.some(a => a.paid);
-    const modalHasPending = modalAppts.some(a => !a.paid);
-    const modalLabel = modalAppts.length === 0 ? "Sem consultas" : (modalHasPaid && modalHasPending) ? "Parcial" : modalHasPaid ? "Pago" : "Pendente";
-    const modalClass = modalAppts.length === 0 ? "unpaid" : (modalHasPaid && modalHasPending) ? "partial" : modalHasPaid ? "paid" : "unpaid";
-    paymentBtn.textContent = modalLabel;
-    paymentBtn.className = `payment-toggle-badge ${modalClass}`;
+    const pendingAppts = modalAppts.filter(a => !a.paid);
+    const paymentListEl = document.getElementById("modal-payment-pending-list");
+    
+    if (pendingAppts.length > 0) {
+        const datesStr = pendingAppts.map(a => formatDateBR(a.date)).join(", ");
+        const label = pendingAppts.length === 1 ? "Pagamento Pendente:" : "Pagamentos Pendentes:";
+        paymentListEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${label} ${datesStr}`;
+        paymentListEl.style.display = "block";
+    } else {
+        paymentListEl.style.display = "none";
+    }
 
     // Render historical records
     renderPatientTimeline(patientId);
@@ -1656,8 +1666,53 @@ function closePatientModal() {
     renderCalendar();
 }
 
-function togglePatientPayment() {
-    // No-op: payment is now per-appointment. Button is informational only.
+}
+
+function toggleEditPatientInfo() {
+    const patient = state.patients.find(p => p.id === activeModalPatientId);
+    if (!patient) return;
+
+    document.getElementById("patient-info-display").style.display = "none";
+    document.getElementById("patient-info-edit").style.display = "flex";
+    
+    document.getElementById("edit-patient-age").value = patient.age || "";
+    document.getElementById("edit-patient-city").value = patient.city || "";
+    document.getElementById("edit-patient-notes").value = patient.notes || "";
+
+    const editBtn = document.getElementById("edit-patient-btn");
+    editBtn.innerHTML = '<i class="fa-solid fa-check"></i> Salvar';
+    editBtn.onclick = savePatientInfo;
+}
+
+function savePatientInfo() {
+    const patient = state.patients.find(p => p.id === activeModalPatientId);
+    if (!patient) return;
+
+    patient.age = parseInt(document.getElementById("edit-patient-age").value) || null;
+    patient.city = document.getElementById("edit-patient-city").value.trim();
+    patient.notes = document.getElementById("edit-patient-notes").value.trim();
+
+    // Update DEFAULT_PATIENTS as well (since we don't have a backend)
+    const defaultPatient = DEFAULT_PATIENTS.find(p => p.id === patient.id);
+    if (defaultPatient) {
+        defaultPatient.age = patient.age;
+        defaultPatient.city = patient.city;
+        defaultPatient.notes = patient.notes;
+    }
+
+    // Refresh UI
+    document.getElementById("modal-patient-age").textContent = patient.age || "-";
+    document.getElementById("modal-patient-city").textContent = patient.city || "Desconhecida";
+    document.getElementById("modal-patient-notes").textContent = patient.notes || "Nenhuma observação informada.";
+
+    document.getElementById("patient-info-display").style.display = "block";
+    document.getElementById("patient-info-edit").style.display = "none";
+    
+    const editBtn = document.getElementById("edit-patient-btn");
+    editBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Editar';
+    editBtn.onclick = toggleEditPatientInfo;
+
+    renderPatientsList(); // Refresh background list
 }
 
 function renderPatientTimeline(patientId) {
@@ -1753,16 +1808,25 @@ function saveInlineNote(date) {
 
 function addNewTimelineDate() {
     if (!activeModalPatientId) return;
-
-    const dateStr = prompt("Digite a data (formato AAAA-MM-DD):", formatDateISO(new Date()));
-    if (!dateStr) return;
-
-    // Simple validation (Format YYYY-MM-DD)
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!regex.test(dateStr)) {
-        alert("Formato inválido! Use AAAA-MM-DD (ex: 2026-07-13)");
-        return;
+    const picker = document.getElementById("hidden-date-picker");
+    if (picker) {
+        // Usa showPicker() nativo
+        try {
+            picker.showPicker();
+        } catch (e) {
+            // Fallback se showPicker não for suportado
+            picker.focus();
+            picker.click();
+        }
     }
+}
+
+function handleNewTimelineDate(event) {
+    if (!activeModalPatientId) return;
+
+    const dateStr = event.target.value;
+    event.target.value = ""; // reset
+    if (!dateStr) return;
 
     const records = JSON.parse(localStorage.getItem("psyassist_records") || "{}");
     if (!records[activeModalPatientId]) records[activeModalPatientId] = [];
@@ -1804,12 +1868,12 @@ function simulateOCR(event) {
         scanner.style.display = "none";
         document.getElementById("notebook-photo-input").value = "";
 
-        // Simulated OCR text options matching patient case study profiles
+        // Simulated OCR text options matching patient case study profiles (without "Digitalizado..." prefix)
         const ocrSamples = [
-            "Digitalizado do caderno: Paciente relata sentimentos recorrentes de angústia social. Discutiu episódios de isolamento autoimposto. Orientado a manter diário de humor.",
-            "Digitalizado do caderno: Progresso na organização de prioridades. Mencionou conflito com o chefe, mas soube lidar de forma assertiva utilizando a técnica de CNV (comunicação não-violenta).",
-            "Digitalizado do caderno: Apresenta ansiedade somatizada em dores no estômago. Trabalhamos respiração diafragmática profunda em sessão. Recomendada continuação.",
-            "Digitalizado do caderno: Paciente demonstrou forte reatividade emocional a críticas. Exploração de crenças nucleares de rejeição na infância. Próximo passo: reestruturação cognitiva."
+            "Paciente relata sentimentos recorrentes de angústia social. Discutiu episódios de isolamento autoimposto. Orientado a manter diário de humor.",
+            "Progresso na organização de prioridades. Mencionou conflito com o chefe, mas soube lidar de forma assertiva utilizando a técnica de CNV (comunicação não-violenta).",
+            "Apresenta ansiedade somatizada em dores no estômago. Trabalhamos respiração diafragmática profunda em sessão. Recomendada continuação.",
+            "Paciente demonstrou forte reatividade emocional a críticas. Exploração de crenças nucleares de rejeição na infância. Próximo passo: reestruturação cognitiva."
         ];
 
         // Pick random clinical sample note
@@ -1823,13 +1887,23 @@ function simulateOCR(event) {
         if (!group) {
             group = { date: todayStr, notes: [] };
             records[activeModalPatientId].push(group);
+            localStorage.setItem("psyassist_records", JSON.stringify(records));
+            renderPatientTimeline(activeModalPatientId);
         }
 
-        group.notes.push(randomNote);
-        localStorage.setItem("psyassist_records", JSON.stringify(records));
-
-        // Re-render timeline
-        renderPatientTimeline(activeModalPatientId);
+        // Não salvar automaticamente! Apenas injetar no input de edição
+        const inputEl = document.getElementById(`input-${todayStr}`);
+        if (!inputEl) {
+            // Se o editor ainda não estiver renderizado por algum motivo
+            renderPatientTimeline(activeModalPatientId);
+        }
+        
+        openInlineNoteEditor(todayStr);
+        const newInputEl = document.getElementById(`input-${todayStr}`);
+        if (newInputEl) {
+            newInputEl.value = randomNote;
+            newInputEl.focus();
+        }
     }, 2800); // 2.8 seconds scan animation
 }
 

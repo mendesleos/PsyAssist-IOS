@@ -396,18 +396,29 @@
             <div class="modal-body">
                 <!-- Patient Profile Box -->
                 <div class="profile-info-box">
-                    <p><strong>Idade:</strong> <span id="modal-patient-age">25</span> anos</p>
-                    <p><strong>Cidade:</strong> <span id="modal-patient-city">São Paulo</span></p>
-                    <p><strong>Observações:</strong> <span id="modal-patient-notes">Anotações básicas aqui...</span></p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Informações do Paciente</span>
+                        <button id="edit-patient-btn" onclick="toggleEditPatientInfo()" style="background: none; border: none; color: var(--accent-color); cursor: pointer; font-size: 0.9rem;">
+                            <i class="fa-solid fa-pen"></i> Editar
+                        </button>
+                    </div>
+                    <div id="patient-info-display">
+                        <p><strong>Idade:</strong> <span id="modal-patient-age">25</span> anos</p>
+                        <p><strong>Cidade:</strong> <span id="modal-patient-city">São Paulo</span></p>
+                        <p><strong>Observações:</strong> <span id="modal-patient-notes">Anotações básicas aqui...</span></p>
+                    </div>
+                    <div id="patient-info-edit" style="display: none; flex-direction: column; gap: 8px;">
+                        <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Idade</label><input type="number" id="edit-patient-age" class="profile-edit-input"></div>
+                        <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Cidade</label><input type="text" id="edit-patient-city" class="profile-edit-input"></div>
+                        <div><label style="font-size: 0.8rem; color: var(--text-secondary);">Observações</label><textarea id="edit-patient-notes" class="profile-edit-input" rows="3"></textarea></div>
+                    </div>
                 </div>
 
-                <!-- Payment Status Toggle -->
-                <div class="payment-status-card">
-                    <span>Status de Pagamento</span>
-                    <button class="payment-toggle-badge paid" id="modal-payment-toggle" onclick="togglePatientPayment()">
-                        Pago
-                    </button>
-                </div>
+                <!-- Payment Status List (Dynamic) -->
+                <div id="modal-payment-pending-list" class="payment-pending-list"></div>
+
+                <!-- Hidden Date Picker for Timeline -->
+                <input type="date" id="hidden-date-picker" style="display: none;" onchange="handleNewTimelineDate(event)">
 
                 <!-- Historical Sessions / Digitalizer OCR Section -->
                 <div class="session-records-header">

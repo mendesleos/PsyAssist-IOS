@@ -1482,8 +1482,33 @@ body.light-theme .center-nav-circle {
     border-radius: 18px;
     padding: 16px;
     margin-bottom: 16px;
-    font-size: 0.88rem;
-    line-height: 1.5;
+}
+
+.profile-info-box p {
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.profile-edit-input {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+body.light-theme .profile-edit-input {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.payment-pending-list {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--unpaid-color);
+    font-weight: 500;
 }
 
 .profile-info-box p {
