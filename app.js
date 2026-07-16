@@ -40,7 +40,8 @@ let state = {
 
 // Função utilitária de busca (apenas match no início do nome ou sobrenome)
 function matchSearchQuery(name, query) {
-    if (!name || !query) return false;
+    if (!name) return false;
+    if (!query) return true; // Se a busca for vazia, mostra todos
     const n = name.toLowerCase();
     const q = query.toLowerCase().trim();
     if (!q) return true;
