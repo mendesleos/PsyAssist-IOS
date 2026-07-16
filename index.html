@@ -177,7 +177,10 @@
                                 <input type="text" id="inline-new-city" placeholder="Cidade" class="profile-edit-input" style="flex: 2;">
                             </div>
                             <textarea id="inline-new-notes" placeholder="Observações iniciais..." class="profile-edit-input" rows="2"></textarea>
-                            <button class="action-btn" style="padding: 10px; font-size: 0.9rem;" onclick="saveNewPatientInline()">Salvar Paciente</button>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="action-btn-outline" style="flex: 1; padding: 10px; font-size: 0.9rem;" onclick="toggleNewPatientInline()">Cancelar</button>
+                                <button class="action-btn" style="flex: 1; padding: 10px; font-size: 0.9rem;" onclick="saveNewPatientInline()">Salvar Paciente</button>
+                            </div>
                         </div>
                     </div>
                 </section>
