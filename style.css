@@ -664,9 +664,9 @@ body.light-theme .appt-time-badge {
 }
 
 .paid-badge.unpaid {
-    background-color: rgba(251, 113, 133, 0.12);
+    background-color: rgba(245, 158, 11, 0.15);
     color: var(--unpaid-color);
-    border: 1px solid rgba(251, 113, 133, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .paid-badge.partial {
@@ -1069,8 +1069,8 @@ body.light-theme .form-group textarea {
 }
 
 .list-action-btn.active {
-    background-color: var(--unpaid-color);
-    border-color: var(--unpaid-color);
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
     color: white;
 }
 
@@ -1089,11 +1089,17 @@ body.light-theme .form-group textarea {
 .delete-patient-card-btn {
     background: none;
     border: none;
-    color: var(--unpaid-color);
+    color: var(--danger-color);
     cursor: pointer;
     font-size: 1.1rem;
     padding: 4px 8px;
     transition: opacity 0.2s;
+}
+
+.unpaid-text-only {
+    color: var(--unpaid-color);
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 .delete-patient-card-btn:hover {

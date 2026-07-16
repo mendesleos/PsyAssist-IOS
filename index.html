@@ -178,7 +178,7 @@
                             </div>
                             <textarea id="inline-new-notes" placeholder="Observações iniciais..." class="profile-edit-input" rows="2"></textarea>
                             <div style="display: flex; gap: 8px;">
-                                <button class="action-btn" style="flex: 1; padding: 10px; font-size: 0.9rem; background-color: var(--unpaid-color); color: white;" onclick="toggleNewPatientInline()">Cancelar</button>
+                                <button class="action-btn" style="flex: 1; padding: 10px; font-size: 0.9rem; background-color: var(--danger-color); color: white;" onclick="toggleNewPatientInline()">Cancelar</button>
                                 <button class="action-btn" style="flex: 1; padding: 10px; font-size: 0.9rem; background-color: var(--accent-color); color: white;" onclick="saveNewPatientInline()">Salvar</button>
                             </div>
                         </div>
@@ -494,10 +494,10 @@
     <div class="modal-overlay" id="confirm-modal">
         <div class="modal-card confirm-modal-card">
             <h3 style="margin-bottom: 12px; color: var(--text-primary);">Atenção</h3>
-            <p style="margin-bottom: 24px; font-size: 0.95rem; line-height: 1.4; color: var(--text-secondary);">Tem certeza que deseja <strong style="color: var(--unpaid-color);">EXCLUIR</strong> uma data que contém anotações?</p>
+            <p style="margin-bottom: 24px; font-size: 0.95rem; line-height: 1.4; color: var(--text-secondary);">Tem certeza que deseja <strong style="color: var(--danger-color);">EXCLUIR</strong> uma data que contém anotações?</p>
             <div style="display: flex; gap: 12px; justify-content: flex-end;">
                 <button class="modal-action-btn-outline" onclick="closeConfirmDeleteModal()">Cancelar</button>
-                <button class="modal-action-btn" style="background-color: var(--unpaid-color);" onclick="confirmDeleteDate()">Sim, Excluir</button>
+                <button class="modal-action-btn" style="background-color: var(--danger-color);" onclick="confirmDeleteDate()">Sim, Excluir</button>
             </div>
         </div>
     </div>
@@ -506,10 +506,10 @@
     <div class="modal-overlay" id="patient-confirm-modal">
         <div class="modal-card confirm-modal-card">
             <h3 style="margin-bottom: 12px; color: var(--text-primary);">Excluir Paciente</h3>
-            <p style="margin-bottom: 24px; font-size: 0.95rem; line-height: 1.4; color: var(--text-secondary);">Tem certeza que deseja excluir o paciente <strong id="delete-patient-name" style="color: var(--unpaid-color);"></strong> e todo o seu histórico clínico? Esta ação é irreversível.</p>
+            <p style="margin-bottom: 24px; font-size: 0.95rem; line-height: 1.4; color: var(--text-secondary);">Tem certeza que deseja excluir o paciente <strong id="delete-patient-name" style="color: var(--danger-color);"></strong> e todo o seu histórico clínico? Esta ação é irreversível.</p>
             <div style="display: flex; gap: 12px; justify-content: flex-end;">
                 <button class="modal-action-btn-outline" onclick="closePatientConfirmDeleteModal()">Cancelar</button>
-                <button class="modal-action-btn" style="background-color: var(--unpaid-color);" onclick="confirmDeletePatient()">Sim, Excluir</button>
+                <button class="modal-action-btn" style="background-color: var(--danger-color);" onclick="confirmDeletePatient()">Sim, Excluir</button>
             </div>
         </div>
     </div>

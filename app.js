@@ -1657,7 +1657,7 @@ function renderPatientsList() {
         let badgeHtml = "";
         if (pendingCount > 0) {
             const label = pendingCount === 1 ? "1 Pagamento Pendente" : `${pendingCount} Pagamentos Pendentes`;
-            badgeHtml = `<span class="paid-badge unpaid">${label}</span>`;
+            badgeHtml = `<span class="unpaid-text-only">${label}</span>`;
         }
 
         let rightActionHtml = `<i class="fa-solid fa-chevron-right" style="color: var(--text-secondary); font-size: 0.8rem;"></i>`;
