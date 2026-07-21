@@ -529,7 +529,7 @@
                     </div>
                     <div style="flex: 1;">
                         <label style="font-size: 0.8rem; color: var(--text-secondary);">Horário</label>
-                        <input type="time" id="appt-modal-time" class="profile-edit-input" style="width: 100%;">
+                        <input type="text" id="appt-modal-time" class="profile-edit-input" style="width: 100%;" placeholder="00:00" inputmode="numeric" maxlength="5" oninput="formatTimeInput(this)">
                     </div>
                 </div>
                 

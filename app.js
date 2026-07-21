@@ -1795,6 +1795,14 @@ let activeModalPatientId = "";
 // ==========================================
 let activeAppointmentId = null;
 
+function formatTimeInput(input) {
+    let value = input.value.replace(/\D/g, ""); // Remove tudo que não for dígito
+    if (value.length > 2) {
+        value = value.substring(0, 2) + ":" + value.substring(2, 4);
+    }
+    input.value = value;
+}
+
 function openAppointmentModal(apptId) {
     const appt = state.appointments.find(a => a.id === apptId);
     if (!appt) return;
@@ -1821,8 +1829,10 @@ function saveAppointmentEdits() {
     const newDate = document.getElementById("appt-modal-date").value;
     const newTime = document.getElementById("appt-modal-time").value;
     
-    if (!newDate || !newTime) {
-        alert("Preencha data e horário válidos.");
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    
+    if (!newDate || !newTime || !timeRegex.test(newTime)) {
+        alert("Preencha uma data válida e um horário no formato 00:00 a 23:59.");
         return;
     }
     
