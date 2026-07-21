@@ -1795,12 +1795,20 @@ let activeModalPatientId = "";
 // ==========================================
 let activeAppointmentId = null;
 
-function formatTimeInput(input) {
-    let value = input.value.replace(/\D/g, ""); // Remove tudo que não for dígito
-    if (value.length > 2) {
-        value = value.substring(0, 2) + ":" + value.substring(2, 4);
+function populateTimeSelects() {
+    const hourSelect = document.getElementById("appt-modal-hour");
+    const minuteSelect = document.getElementById("appt-modal-minute");
+    
+    if (hourSelect.options.length === 0) {
+        for (let i = 0; i < 24; i++) {
+            const val = i.toString().padStart(2, "0");
+            hourSelect.add(new Option(val, val));
+        }
+        for (let i = 0; i < 60; i++) {
+            const val = i.toString().padStart(2, "0");
+            minuteSelect.add(new Option(val, val));
+        }
     }
-    input.value = value;
 }
 
 function openAppointmentModal(apptId) {
@@ -1810,7 +1818,11 @@ function openAppointmentModal(apptId) {
     activeAppointmentId = apptId;
     document.getElementById("appt-modal-patient-name").textContent = appt.patientName;
     document.getElementById("appt-modal-date").value = appt.date;
-    document.getElementById("appt-modal-time").value = appt.time;
+    populateTimeSelects();
+    
+    const timeParts = appt.time.split(":");
+    document.getElementById("appt-modal-hour").value = timeParts[0] || "00";
+    document.getElementById("appt-modal-minute").value = timeParts[1] || "00";
     
     document.getElementById("appointment-action-modal").classList.add("active");
 }
@@ -1827,12 +1839,13 @@ function saveAppointmentEdits() {
     if (!appt) return;
     
     const newDate = document.getElementById("appt-modal-date").value;
-    const newTime = document.getElementById("appt-modal-time").value;
+    const hour = document.getElementById("appt-modal-hour").value;
+    const minute = document.getElementById("appt-modal-minute").value;
     
-    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    const newTime = `${hour}:${minute}`;
     
-    if (!newDate || !newTime || !timeRegex.test(newTime)) {
-        alert("Preencha uma data válida e um horário no formato 00:00 a 23:59.");
+    if (!newDate) {
+        alert("Preencha uma data válida.");
         return;
     }
     

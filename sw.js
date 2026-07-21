@@ -1,5 +1,5 @@
 // PsyAssist Service Worker - Cache & Offline Strategy
-const CACHE_NAME = 'psyassist-v24';
+const CACHE_NAME = 'psyassist-v25';
 
 // Recursos essenciais para cache (app funciona offline depois do primeiro acesso)
 const ASSETS_TO_CACHE = [

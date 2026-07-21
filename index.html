@@ -529,7 +529,11 @@
                     </div>
                     <div style="flex: 1;">
                         <label style="font-size: 0.8rem; color: var(--text-secondary);">Horário</label>
-                        <input type="text" id="appt-modal-time" class="profile-edit-input" style="width: 100%;" placeholder="00:00" inputmode="numeric" maxlength="5" oninput="formatTimeInput(this)">
+                        <div style="display: flex; gap: 4px; align-items: center;">
+                            <select id="appt-modal-hour" class="profile-edit-input" style="flex: 1; padding: 12px 4px; text-align: center;"></select>
+                            <span style="font-weight: 600; color: var(--text-primary);">:</span>
+                            <select id="appt-modal-minute" class="profile-edit-input" style="flex: 1; padding: 12px 4px; text-align: center;"></select>
+                        </div>
                     </div>
                 </div>
                 
