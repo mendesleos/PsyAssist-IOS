@@ -1141,36 +1141,22 @@ function chatStep_Cancelar_Confirmar(appt) {
         `⚠️ Tem certeza que deseja <strong>cancelar</strong> esta consulta? Esta ação não pode ser desfeita.`,
         500
     ).then(() => {
-        chatAddOptions([
-            { label: "🗑️ Sim, cancelar consulta", action: () => chatStep_Cancelar_Save() },
-            { label: "✏️ Editar informações", action: () => chatStep_EditCancelar() }
-        ]);
-    });
-}
-
-function chatStep_EditCancelar() {
-    chatAddBotMessage("O que você deseja alterar?", 400).then(() => {
-        const options = [
-            { label: "👤 Paciente", action: () => {
-                chatAddUserMessage("Paciente");
-                chatAddBotMessage("De qual paciente você deseja cancelar a consulta?", 400).then(() => {
-                    chatAddSearchInput("Buscar paciente...", chatStep_Cancelar_ProcessPatient);
-                });
-            }}
-        ];
-
         const appts = state.appointments.filter(a => a.patientId === chatState.patientId);
-        if (appts.length > 1) {
-            options.push({ label: "📅 Consulta Selecionada", action: () => {
-                // Ao clicar aqui, o usuário já passou pelo ProcessPatient antes, vamos apenas re-renderizar as opções daquele paciente
-                chatAddUserMessage("Consulta Selecionada");
-                const pt = { id: chatState.patientId, name: chatState.patientName };
-                // Redireciona para o processo p/ perguntar qual consulta
-                chatStep_Cancelar_ProcessPatient(pt);
-            }});
-        }
 
-        chatAddOptions(options);
+        if (appts.length === 1) {
+            chatAddOptions([
+                { label: "🗑️ Sim, cancelar consulta", action: () => chatStep_Cancelar_Save() },
+                { label: "❌ Não cancelar", action: () => closeGuidedChat() }
+            ]);
+        } else {
+            chatAddOptions([
+                { label: "🗑️ Sim, cancelar consulta", action: () => chatStep_Cancelar_Save() },
+                { label: "📅 Escolher outra consulta", action: () => {
+                    chatAddUserMessage("Escolher outra consulta");
+                    chatStep_Cancelar_ProcessPatient({ id: chatState.patientId, name: chatState.patientName });
+                }}
+            ]);
+        }
     });
 }
 
