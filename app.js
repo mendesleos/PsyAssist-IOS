@@ -1065,6 +1065,7 @@ function chatStep_Atualizar_Save() {
         700
     ).then(() => {
         chatAddOptions([
+            { label: "📅 Atualizar outra consulta", action: () => initChatFlowAtualizarConsulta() },
             { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
         ]);
     });
