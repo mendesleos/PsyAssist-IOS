@@ -478,7 +478,9 @@ function chatAddBotMessage(text, delay = 0) {
             const box = document.getElementById("chat-messages");
             const bubble = document.createElement("div");
             bubble.className = "chat-bubble chat-bot";
-            bubble.innerHTML = text;
+            // Converte Markdown simples (**) para HTML (<strong>)
+            const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            bubble.innerHTML = formattedText;
             box.appendChild(bubble);
             box.scrollTop = box.scrollHeight;
             resolve(bubble);
