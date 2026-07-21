@@ -397,6 +397,8 @@ function switchTab(tabId) {
 // GUIDED CHAT UI CONTROLS
 function startGuidedChat(action) {
     document.getElementById("guided-chat-overlay").style.display = "flex";
+    chatHistory = [];
+    updateChatBackButton();
     
     // Inicializa a máquina de estados do chat para a ação solicitada
     if (action === 'agendar') {
@@ -432,6 +434,41 @@ function closeGuidedChat() {
 
 // Estado interno do chat
 let chatState = {};
+let chatHistory = [];
+
+function updateChatBackButton() {
+    const btn = document.getElementById("chat-back-btn");
+    if (btn) {
+        if (chatHistory.length > 0) {
+            btn.style.display = "flex";
+        } else {
+            btn.style.display = "none";
+        }
+    }
+}
+
+function chatGoBack() {
+    if (chatHistory.length === 0) return;
+    const lastAction = chatHistory.pop();
+    
+    // Remove todos os nós criados após o input anterior
+    let node = lastAction.inputRow.nextSibling;
+    while (node) {
+        const next = node.nextSibling;
+        node.remove();
+        node = next;
+    }
+    
+    // Restaura o estado da fotografia
+    chatState = JSON.parse(JSON.stringify(lastAction.stateSnapshot));
+    
+    // Re-exibe e reabilita os inputs
+    lastAction.inputRow.style.display = lastAction.displayStyle || "flex";
+    lastAction.inputRow.style.opacity = "1";
+    lastAction.inputRow.querySelectorAll("button").forEach(b => b.disabled = false);
+    
+    updateChatBackButton();
+}
 
 // --- Helpers de UI do Chat ---
 
@@ -462,6 +499,9 @@ function chatAddOptions(options) {
     const box = document.getElementById("chat-messages");
     const group = document.createElement("div");
     group.className = "chat-options-group";
+    
+    const stateSnapshot = JSON.parse(JSON.stringify(chatState));
+    
     options.forEach(opt => {
         const btn = document.createElement("button");
         btn.className = "chat-option-btn";
@@ -470,6 +510,14 @@ function chatAddOptions(options) {
             // Desabilita todos os botões do grupo para evitar clique duplo
             group.querySelectorAll("button").forEach(b => b.disabled = true);
             group.style.opacity = "0.5";
+            
+            chatHistory.push({
+                inputRow: group,
+                stateSnapshot: stateSnapshot,
+                displayStyle: "flex"
+            });
+            updateChatBackButton();
+            
             opt.action();
         };
         group.appendChild(btn);
@@ -482,6 +530,8 @@ function chatAddSearchInput(placeholder, onSelect) {
     const box = document.getElementById("chat-messages");
     const wrapper = document.createElement("div");
     wrapper.className = "chat-search-wrapper";
+
+    const stateSnapshot = JSON.parse(JSON.stringify(chatState));
 
     const input = document.createElement("input");
     input.type = "text";
@@ -504,7 +554,13 @@ function chatAddSearchInput(placeholder, onSelect) {
             item.className = "chat-search-result-item";
             item.textContent = p.name;
             item.onclick = () => {
-                wrapper.remove();
+                wrapper.style.display = "none";
+                chatHistory.push({
+                    inputRow: wrapper,
+                    stateSnapshot: stateSnapshot,
+                    displayStyle: "block"
+                });
+                updateChatBackButton();
                 onSelect(p);
             };
             results.appendChild(item);
@@ -522,6 +578,8 @@ function chatAddTextInput(placeholder, type, onConfirm) {
     const box = document.getElementById("chat-messages");
     const row = document.createElement("div");
     row.className = "chat-input-row";
+    
+    const stateSnapshot = JSON.parse(JSON.stringify(chatState));
 
     const input = document.createElement("input");
     input.type = type || "text";
@@ -535,7 +593,13 @@ function chatAddTextInput(placeholder, type, onConfirm) {
     const submit = () => {
         const val = input.value.trim();
         if (!val) return;
-        row.remove();
+        row.style.display = "none";
+        chatHistory.push({
+            inputRow: row,
+            stateSnapshot: stateSnapshot,
+            displayStyle: "flex"
+        });
+        updateChatBackButton();
         onConfirm(val);
     };
 
@@ -553,6 +617,8 @@ function chatAddDateInput(onConfirm) {
     const box = document.getElementById("chat-messages");
     const row = document.createElement("div");
     row.className = "chat-input-row";
+    
+    const stateSnapshot = JSON.parse(JSON.stringify(chatState));
 
     const input = document.createElement("input");
     input.type = "date";
@@ -567,7 +633,13 @@ function chatAddDateInput(onConfirm) {
     const submit = () => {
         const val = input.value;
         if (!val) return;
-        row.remove();
+        row.style.display = "none";
+        chatHistory.push({
+            inputRow: row,
+            stateSnapshot: stateSnapshot,
+            displayStyle: "flex"
+        });
+        updateChatBackButton();
         onConfirm(val);
     };
 
@@ -729,10 +801,9 @@ function chatStep_Confirm() {
                 action: () => chatStep_Save()
             },
             {
-                label: "↩️ Escolher outro horário",
+                label: "✏️ Editar informações",
                 action: () => {
-                    chatAddUserMessage("Quero mudar o horário");
-                    chatStep_ShowAvailableSlots(chatState.date);
+                    chatGoBack();
                 }
             }
         ]);
@@ -879,7 +950,7 @@ function chatStep_Atualizar_Confirm() {
     ).then(() => {
         chatAddOptions([
             { label: "✅ Confirmar Atualização", action: () => chatStep_Atualizar_Save() },
-            { label: "↩️ Cancelar e sair", action: () => closeGuidedChat() }
+            { label: "✏️ Editar informações", action: () => chatGoBack() }
         ]);
     });
 }
@@ -974,7 +1045,7 @@ function chatStep_Cancelar_Confirmar(appt) {
     ).then(() => {
         chatAddOptions([
             { label: "🗑️ Sim, cancelar consulta", action: () => chatStep_Cancelar_Save() },
-            { label: "↩️ Não, manter consulta", action: () => closeGuidedChat() }
+            { label: "✏️ Editar informações", action: () => chatGoBack() }
         ]);
     });
 }
@@ -1103,7 +1174,7 @@ function initChatFlowRemoverPaciente() {
             ).then(() => {
                 chatAddOptions([
                     { label: "🗑️ Sim, remover paciente", action: () => chatStep_Remover_Save() },
-                    { label: "↩️ Cancelar", action: () => closeGuidedChat() }
+                    { label: "✏️ Editar informações", action: () => chatGoBack() }
                 ]);
             });
         });

@@ -352,6 +352,27 @@ body.light-theme .secondary-action {
     font-size: 1.4rem;
 }
 
+.chat-back-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, opacity 0.2s;
+    opacity: 0.8;
+}
+
+.chat-back-btn:hover {
+    opacity: 1;
+}
+
+.chat-back-btn:active {
+    transform: scale(0.9);
+}
+
 .chat-close-btn {
     background: rgba(255, 255, 255, 0.1);
     border: none;

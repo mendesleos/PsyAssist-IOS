@@ -373,9 +373,14 @@
             <!-- Guided Chat UI Overlay -->
             <div id="guided-chat-overlay" class="chat-overlay" style="display: none;">
                 <div class="chat-header">
-                    <div class="chat-header-info">
-                        <i class="fa-solid fa-robot"></i>
-                        <span>PsyAssist IA</span>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <button id="chat-back-btn" class="chat-back-btn" onclick="chatGoBack()" style="display: none;">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <div class="chat-header-info">
+                            <i class="fa-solid fa-robot"></i>
+                            <span>PsyAssist IA</span>
+                        </div>
                     </div>
                     <button class="chat-close-btn" onclick="closeGuidedChat()">
                         <i class="fa-solid fa-xmark"></i>
