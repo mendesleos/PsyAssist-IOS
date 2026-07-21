@@ -937,8 +937,9 @@ function initChatFlowAtualizarConsulta() {
             if (!appt) {
                 chatAddBotMessage(`O paciente **${patient.name}** não possui consultas agendadas no momento.`, 400).then(() => {
                     chatAddOptions([
+                        { label: "👤 Escolher outro paciente", action: () => initChatFlowAtualizarConsulta() },
                         { label: "📅 Agendar nova consulta", action: () => initChatFlowAgendar() },
-                        { label: "🏠 Sair", action: () => closeGuidedChat() }
+                        { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
                     ]);
                 });
                 return;
@@ -1092,6 +1093,7 @@ function chatStep_Cancelar_ProcessPatient(patient) {
     if (appts.length === 0) {
         chatAddBotMessage(`O paciente <strong>${patient.name}</strong> não possui consultas agendadas no momento.`, 400).then(() => {
             chatAddOptions([
+                { label: "👤 Escolher outro paciente", action: () => initChatFlowCancelarConsulta() },
                 { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
             ]);
         });
@@ -1410,6 +1412,7 @@ function initChatFlowPagamento() {
             if (appts.length === 0) {
                 chatAddBotMessage(`<strong>${patient.name}</strong> não possui consultas agendadas. Não há pagamento para registrar.`, 400).then(() => {
                     chatAddOptions([
+                        { label: "👤 Escolher outro paciente", action: () => initChatFlowPagamento() },
                         { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
                     ]);
                 });
