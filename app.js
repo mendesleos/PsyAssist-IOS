@@ -710,27 +710,77 @@ function chatStep_NewPatient_City() {
         chatAddTextInput("Cidade...", "text", (val) => {
             chatState.newCity = val;
             chatAddUserMessage(val);
-
-            // Salva o novo paciente imediatamente
-            const newId = "p_" + Date.now();
-            const newPatient = {
-                id: newId,
-                name: chatState.newName,
-                age: chatState.newAge,
-                city: chatState.newCity,
-                notes: "",
-                paid: false
-            };
-            state.patients.push(newPatient);
-            saveState();
-
-            chatState.patientId = newId;
-            chatState.patientName = chatState.newName;
-
-            chatAddBotMessage(`✅ **${chatState.newName}** foi cadastrado com sucesso!`, 500).then(() => {
-                chatStep_AskDate();
-            });
+            chatStep_NewPatient_Confirm();
         });
+    });
+}
+
+function chatStep_NewPatient_Confirm() {
+    chatAddBotMessage(`Resumo do paciente:\n\n👤 Nome: <strong>${chatState.newName}</strong>\n🎂 Idade: <strong>${chatState.newAge}</strong>\n📍 Cidade: <strong>${chatState.newCity}</strong>\n\nConfirmar informações?`, 600).then(() => {
+        chatAddOptions([
+            { label: "✅ Confirmar Cadastro", action: () => {
+                chatAddUserMessage("Confirmar Cadastro");
+                
+                // Salva o novo paciente imediatamente
+                const newId = "p_" + Date.now();
+                const newPatient = {
+                    id: newId,
+                    name: chatState.newName,
+                    age: chatState.newAge,
+                    city: chatState.newCity,
+                    notes: "",
+                    paid: false
+                };
+                state.patients.push(newPatient);
+                saveState();
+                renderPatientsList();
+                
+                chatState.patientId = newId;
+                chatState.patientName = chatState.newName;
+                
+                chatAddBotMessage(`✅ **${chatState.newName}** foi cadastrado com sucesso!`, 500).then(() => {
+                    chatStep_AskDate();
+                });
+            }},
+            { label: "✏️ Editar informações", action: () => chatStep_EditNewPatient() }
+        ]);
+    });
+}
+
+function chatStep_EditNewPatient() {
+    chatAddBotMessage("O que você deseja alterar?", 400).then(() => {
+        chatAddOptions([
+            { label: "👤 Nome", action: () => {
+                chatAddUserMessage("Nome");
+                chatAddBotMessage("Qual o **nome completo** dele?", 400).then(() => {
+                    chatAddTextInput("Nome completo...", "text", (val) => {
+                        chatState.newName = val;
+                        chatAddUserMessage(val);
+                        chatStep_NewPatient_Confirm();
+                    });
+                });
+            }},
+            { label: "🎂 Idade", action: () => {
+                chatAddUserMessage("Idade");
+                chatAddBotMessage("Qual a **idade** dele?", 400).then(() => {
+                    chatAddTextInput("Idade...", "number", (val) => {
+                        chatState.newAge = parseInt(val) || 0;
+                        chatAddUserMessage(val);
+                        chatStep_NewPatient_Confirm();
+                    });
+                });
+            }},
+            { label: "📍 Cidade", action: () => {
+                chatAddUserMessage("Cidade");
+                chatAddBotMessage("E de qual **cidade**?", 400).then(() => {
+                    chatAddTextInput("Cidade...", "text", (val) => {
+                        chatState.newCity = val;
+                        chatAddUserMessage(val);
+                        chatStep_NewPatient_Confirm();
+                    });
+                });
+            }}
+        ]);
     });
 }
 
@@ -1146,40 +1196,89 @@ function chatStep_AddPaciente_City() {
         chatAddTextInput("Cidade...", "text", (val) => {
             chatState.newCity = val;
             chatAddUserMessage(val);
-
-            // Salva o novo paciente
-            const newId = "p_" + Date.now();
-            const newPatient = {
-                id: newId,
-                name: chatState.newName,
-                age: chatState.newAge,
-                city: chatState.newCity,
-                notes: "",
-                paid: false
-            };
-            state.patients.push(newPatient);
-            saveState();
-            renderPatientsList();
-
-            chatState.patientId = newId;
-            chatState.patientName = chatState.newName;
-
-            chatAddBotMessage(
-                `🎉 <strong>${chatState.newName}</strong> foi cadastrado com sucesso!<br><br>Deseja agendar uma consulta para ele agora?`,
-                600
-            ).then(() => {
-                chatAddOptions([
-                    {
-                        label: "📅 Sim, agendar consulta",
-                        action: () => {
-                            chatAddUserMessage("Sim, agendar consulta");
-                            chatStep_AskDate();
-                        }
-                    },
-                    { label: "🏠 Não, voltar ao início", action: () => closeGuidedChat() }
-                ]);
-            });
+            chatStep_AddPaciente_Confirm();
         });
+    });
+}
+
+function chatStep_AddPaciente_Confirm() {
+    chatAddBotMessage(`Resumo do paciente:\n\n👤 Nome: <strong>${chatState.newName}</strong>\n🎂 Idade: <strong>${chatState.newAge}</strong>\n📍 Cidade: <strong>${chatState.newCity}</strong>\n\nConfirmar informações?`, 600).then(() => {
+        chatAddOptions([
+            { label: "✅ Confirmar Cadastro", action: () => {
+                chatAddUserMessage("Confirmar Cadastro");
+
+                // Salva o novo paciente
+                const newId = "p_" + Date.now();
+                const newPatient = {
+                    id: newId,
+                    name: chatState.newName,
+                    age: chatState.newAge,
+                    city: chatState.newCity,
+                    notes: "",
+                    paid: false
+                };
+                state.patients.push(newPatient);
+                saveState();
+                renderPatientsList();
+
+                chatState.patientId = newId;
+                chatState.patientName = chatState.newName;
+
+                chatAddBotMessage(
+                    `🎉 <strong>${chatState.newName}</strong> foi cadastrado com sucesso!<br><br>Deseja agendar uma consulta para ele agora?`,
+                    600
+                ).then(() => {
+                    chatAddOptions([
+                        {
+                            label: "📅 Sim, agendar consulta",
+                            action: () => {
+                                chatAddUserMessage("Sim, agendar consulta");
+                                chatStep_AskDate();
+                            }
+                        },
+                        { label: "🏠 Não, voltar ao início", action: () => closeGuidedChat() }
+                    ]);
+                });
+            }},
+            { label: "✏️ Editar informações", action: () => chatStep_EditAddPaciente() }
+        ]);
+    });
+}
+
+function chatStep_EditAddPaciente() {
+    chatAddBotMessage("O que você deseja alterar?", 400).then(() => {
+        chatAddOptions([
+            { label: "👤 Nome", action: () => {
+                chatAddUserMessage("Nome");
+                chatAddBotMessage("Qual o <strong>nome completo</strong> dele?", 400).then(() => {
+                    chatAddTextInput("Nome completo...", "text", (val) => {
+                        chatState.newName = val;
+                        chatAddUserMessage(val);
+                        chatStep_AddPaciente_Confirm();
+                    });
+                });
+            }},
+            { label: "🎂 Idade", action: () => {
+                chatAddUserMessage("Idade");
+                chatAddBotMessage("Qual a <strong>idade</strong> dele?", 400).then(() => {
+                    chatAddTextInput("Idade...", "number", (val) => {
+                        chatState.newAge = parseInt(val) || 0;
+                        chatAddUserMessage(val);
+                        chatStep_AddPaciente_Confirm();
+                    });
+                });
+            }},
+            { label: "📍 Cidade", action: () => {
+                chatAddUserMessage("Cidade");
+                chatAddBotMessage("E de qual <strong>cidade</strong>?", 400).then(() => {
+                    chatAddTextInput("Cidade...", "text", (val) => {
+                        chatState.newCity = val;
+                        chatAddUserMessage(val);
+                        chatStep_AddPaciente_Confirm();
+                    });
+                });
+            }}
+        ]);
     });
 }
 
