@@ -1078,46 +1078,48 @@ function initChatFlowCancelarConsulta() {
 
     chatAddUserMessage("Cancelar Consulta");
     chatAddBotMessage("De qual paciente você deseja cancelar a consulta?", 400).then(() => {
-        chatAddSearchInput("Buscar paciente...", (patient) => {
-            chatState.patientId = patient.id;
-            chatState.patientName = patient.name;
-            chatAddUserMessage(patient.name);
+        chatAddSearchInput("Buscar paciente...", chatStep_Cancelar_ProcessPatient);
+    });
+}
 
-            const appts = state.appointments.filter(a => a.patientId === patient.id);
+function chatStep_Cancelar_ProcessPatient(patient) {
+    chatState.patientId = patient.id;
+    chatState.patientName = patient.name;
+    chatAddUserMessage(patient.name);
 
-            if (appts.length === 0) {
-                chatAddBotMessage(`O paciente <strong>${patient.name}</strong> não possui consultas agendadas no momento.`, 400).then(() => {
-                    chatAddOptions([
-                        { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
-                    ]);
-                });
-                return;
-            }
+    const appts = state.appointments.filter(a => a.patientId === patient.id);
 
-            if (appts.length === 1) {
-                // Só uma consulta: vai direto para confirmação
-                chatStep_Cancelar_Confirmar(appts[0]);
-                return;
-            }
-
-            // Mais de uma consulta: pede para selecionar
-            chatAddBotMessage(
-                `<strong>${patient.name}</strong> possui <strong>${appts.length} consultas agendadas</strong>. Qual delas deseja cancelar?`,
-                400
-            ).then(() => {
-                const sortedAppts = [...appts].sort((a, b) => {
-                    if (a.date !== b.date) return a.date.localeCompare(b.date);
-                    return a.time.localeCompare(b.time);
-                });
-
-                chatAddOptions(
-                    sortedAppts.map(appt => ({
-                        label: `📅 ${formatDateBR(appt.date)} às ${appt.time}`,
-                        action: () => chatStep_Cancelar_Confirmar(appt)
-                    }))
-                );
-            });
+    if (appts.length === 0) {
+        chatAddBotMessage(`O paciente <strong>${patient.name}</strong> não possui consultas agendadas no momento.`, 400).then(() => {
+            chatAddOptions([
+                { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
+            ]);
         });
+        return;
+    }
+
+    if (appts.length === 1) {
+        // Só uma consulta: vai direto para confirmação
+        chatStep_Cancelar_Confirmar(appts[0]);
+        return;
+    }
+
+    // Mais de uma consulta: pede para selecionar
+    chatAddBotMessage(
+        `<strong>${patient.name}</strong> possui <strong>${appts.length} consultas agendadas</strong>. Qual delas deseja cancelar?`,
+        400
+    ).then(() => {
+        const sortedAppts = [...appts].sort((a, b) => {
+            if (a.date !== b.date) return a.date.localeCompare(b.date);
+            return a.time.localeCompare(b.time);
+        });
+
+        chatAddOptions(
+            sortedAppts.map(appt => ({
+                label: `📅 ${formatDateBR(appt.date)} às ${appt.time}`,
+                action: () => chatStep_Cancelar_Confirmar(appt)
+            }))
+        );
     });
 }
 
@@ -1132,8 +1134,34 @@ function chatStep_Cancelar_Confirmar(appt) {
     ).then(() => {
         chatAddOptions([
             { label: "🗑️ Sim, cancelar consulta", action: () => chatStep_Cancelar_Save() },
-            { label: "✏️ Editar informações", action: () => chatGoBack() }
+            { label: "✏️ Editar informações", action: () => chatStep_EditCancelar() }
         ]);
+    });
+}
+
+function chatStep_EditCancelar() {
+    chatAddBotMessage("O que você deseja alterar?", 400).then(() => {
+        const options = [
+            { label: "👤 Paciente", action: () => {
+                chatAddUserMessage("Paciente");
+                chatAddBotMessage("De qual paciente você deseja cancelar a consulta?", 400).then(() => {
+                    chatAddSearchInput("Buscar paciente...", chatStep_Cancelar_ProcessPatient);
+                });
+            }}
+        ];
+
+        const appts = state.appointments.filter(a => a.patientId === chatState.patientId);
+        if (appts.length > 1) {
+            options.push({ label: "📅 Consulta Selecionada", action: () => {
+                // Ao clicar aqui, o usuário já passou pelo ProcessPatient antes, vamos apenas re-renderizar as opções daquele paciente
+                chatAddUserMessage("Consulta Selecionada");
+                const pt = { id: chatState.patientId, name: chatState.patientName };
+                // Redireciona para o processo p/ perguntar qual consulta
+                chatStep_Cancelar_ProcessPatient(pt);
+            }});
+        }
+
+        chatAddOptions(options);
     });
 }
 
@@ -1293,27 +1321,42 @@ function initChatFlowRemoverPaciente() {
 
     chatAddUserMessage("Remover Paciente");
     chatAddBotMessage("Qual paciente você deseja <strong>remover do sistema</strong>?", 400).then(() => {
-        chatAddSearchInput("Buscar paciente...", (patient) => {
-            chatState.patientId = patient.id;
-            chatState.patientName = patient.name;
-            chatAddUserMessage(patient.name);
+        chatAddSearchInput("Buscar paciente...", chatStep_Remover_ProcessPatient);
+    });
+}
 
-            const apptCount = state.appointments.filter(a => a.patientId === patient.id).length;
-            const apptWarning = apptCount > 0
-                ? `<br><br>⚠️ Atenção: este paciente possui <strong>${apptCount} consulta(s) agendada(s)</strong> que também serão removidas.`
-                : "";
+function chatStep_Remover_ProcessPatient(patient) {
+    chatState.patientId = patient.id;
+    chatState.patientName = patient.name;
+    chatAddUserMessage(patient.name);
 
-            chatAddBotMessage(
-                `Você selecionou: <strong>${patient.name}</strong>.${apptWarning}<br><br>` +
-                `Esta ação <strong>não pode ser desfeita</strong>. Deseja prosseguir?`,
-                500
-            ).then(() => {
-                chatAddOptions([
-                    { label: "🗑️ Sim, remover paciente", action: () => chatStep_Remover_Save() },
-                    { label: "✏️ Editar informações", action: () => chatGoBack() }
-                ]);
-            });
-        });
+    const apptCount = state.appointments.filter(a => a.patientId === patient.id).length;
+    const apptWarning = apptCount > 0
+        ? `<br><br>⚠️ Atenção: este paciente possui <strong>${apptCount} consulta(s) agendada(s)</strong> que também serão removidas.`
+        : "";
+
+    chatAddBotMessage(
+        `Você selecionou: <strong>${patient.name}</strong>.${apptWarning}<br><br>` +
+        `Esta ação <strong>não pode ser desfeita</strong>. Deseja prosseguir?`,
+        500
+    ).then(() => {
+        chatAddOptions([
+            { label: "🗑️ Sim, remover paciente", action: () => chatStep_Remover_Save() },
+            { label: "✏️ Editar informações", action: () => chatStep_EditRemover() }
+        ]);
+    });
+}
+
+function chatStep_EditRemover() {
+    chatAddBotMessage("O que você deseja alterar?", 400).then(() => {
+        chatAddOptions([
+            { label: "👤 Paciente", action: () => {
+                chatAddUserMessage("Paciente");
+                chatAddBotMessage("Qual paciente você deseja <strong>remover do sistema</strong>?", 400).then(() => {
+                    chatAddSearchInput("Buscar paciente...", chatStep_Remover_ProcessPatient);
+                });
+            }}
+        ]);
     });
 }
 
