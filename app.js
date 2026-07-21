@@ -804,10 +804,32 @@ function chatStep_Confirm() {
             },
             {
                 label: "✏️ Editar informações",
-                action: () => {
-                    chatGoBack();
-                }
+                action: () => chatStep_EditAgendamento()
             }
+        ]);
+    });
+}
+
+function chatStep_EditAgendamento() {
+    chatAddBotMessage("O que você deseja alterar?", 400).then(() => {
+        chatAddOptions([
+            { label: "👤 Nome do Paciente", action: () => {
+                chatAddUserMessage("Nome do Paciente");
+                chatAddBotMessage("É para um paciente existente ou vou cadastrar um novo?", 400).then(() => {
+                    chatAddOptions([
+                        { label: "👤 Paciente Existente", action: () => chatStep_ExistingPatient() },
+                        { label: "➕ Novo Cadastro",       action: () => chatStep_NewPatient_Name() }
+                    ]);
+                });
+            }},
+            { label: "📅 Dia da Consulta", action: () => {
+                chatAddUserMessage("Dia da Consulta");
+                chatStep_AskDate();
+            }},
+            { label: "⏰ Horário", action: () => {
+                chatAddUserMessage("Horário");
+                chatStep_ShowAvailableSlots(chatState.date);
+            }}
         ]);
     });
 }
@@ -952,7 +974,20 @@ function chatStep_Atualizar_Confirm() {
     ).then(() => {
         chatAddOptions([
             { label: "✅ Confirmar Atualização", action: () => chatStep_Atualizar_Save() },
-            { label: "✏️ Editar informações", action: () => chatGoBack() }
+            { label: "✏️ Editar informações", action: () => chatStep_EditAtualizacao() }
+        ]);
+    });
+}
+
+function chatStep_EditAtualizacao() {
+    chatAddBotMessage("O que você deseja alterar?", 400).then(() => {
+        chatAddOptions([
+            { label: "📅 Dia da Consulta", action: () => {
+                chatStep_Atualizar_MudarDia();
+            }},
+            { label: "⏰ Horário", action: () => {
+                chatStep_Atualizar_MudarHorario();
+            }}
         ]);
     });
 }
