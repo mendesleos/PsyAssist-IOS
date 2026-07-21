@@ -22,8 +22,53 @@
     --transition-speed: 0.3s;
 }
 
-/* Light Theme overrides */
-body.light-theme {
+/* ====================
+   MÚLTIPLOS TEMAS
+   ==================== */
+
+/* 1. Midnight Purple (Padrão/Default já está no :root) */
+body[data-theme="midnight"] {
+    /* Mantém as cores do :root */
+}
+
+/* 2. Aurora Green */
+body[data-theme="aurora"] {
+    --bg-color: #0b1411;
+    --frame-bg: #111d19;
+    --card-bg: rgba(22, 43, 36, 0.7);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --text-primary: #ecfdf5;
+    --text-secondary: #94a3b8;
+    --accent-color: #10b981;
+    --accent-glow: rgba(16, 185, 129, 0.2);
+}
+
+/* 3. Nordic Blue */
+body[data-theme="nordic"] {
+    --bg-color: #2e3440;
+    --frame-bg: #3b4252;
+    --card-bg: rgba(67, 76, 94, 0.7);
+    --border-color: rgba(216, 222, 233, 0.08);
+    --text-primary: #eceff4;
+    --text-secondary: #d8dee9;
+    --accent-color: #88c0d0;
+    --accent-glow: rgba(136, 192, 208, 0.2);
+}
+
+/* 4. Rose Gold */
+body[data-theme="rosegold"] {
+    --bg-color: #1e1115;
+    --frame-bg: #29181e;
+    --card-bg: rgba(56, 32, 42, 0.7);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --text-primary: #fff1f2;
+    --text-secondary: #fecdd3;
+    --accent-color: #fda4af;
+    --accent-glow: rgba(253, 164, 175, 0.2);
+}
+
+/* 5. Pure Light */
+body[data-theme="light"] {
     --bg-color: #f0f2f5;
     --frame-bg: #ffffff;
     --card-bg: rgba(243, 244, 246, 0.95);
@@ -32,10 +77,18 @@ body.light-theme {
     --text-secondary: #6b7280;
     --accent-color: #6366f1;
     --accent-glow: rgba(99, 102, 241, 0.1);
-    --success-color: #0ea5e9;
-    --danger-color: #ef4444;
-    --paid-color: #10b981;
-    --unpaid-color: #f59e0b;
+}
+
+/* 6. Onyx Black (OLED) */
+body[data-theme="onyx"] {
+    --bg-color: #000000;
+    --frame-bg: #0a0a0a;
+    --card-bg: rgba(26, 26, 26, 0.8);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-primary: #ffffff;
+    --text-secondary: #a3a3a3;
+    --accent-color: #fbbf24;
+    --accent-glow: rgba(251, 191, 36, 0.2);
 }
 
 * {
@@ -2051,4 +2104,27 @@ body.light-theme .inline-note-editor input {
 .modal-action-btn:hover,
 .modal-action-btn-outline:hover {
     opacity: 0.8;
+}
+/* Themes Grid em Ajustes */
+.themes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding-top: 10px;
+}
+
+.theme-circle {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 2px solid var(--border-color);
+    transition: transform var(--transition-speed), border-color var(--transition-speed);
+}
+
+.theme-circle:hover {
+    transform: scale(1.05);
+}
+
+.theme-circle:active {
+    transform: scale(0.95);
 }

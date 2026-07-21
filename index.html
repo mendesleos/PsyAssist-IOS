@@ -257,13 +257,17 @@
                         <label class="settings-label">Preferências Visuais</label>
                         <div class="setting-row">
                             <div class="setting-row-info">
-                                <span>Tema Escuro</span>
-                                <small>Reduz brilho e economiza bateria</small>
+                                <span>Tema do Aplicativo</span>
+                                <small>Personalize a paleta de cores</small>
                             </div>
-                            <label class="switch">
-                                <input type="checkbox" id="theme-toggle" checked>
-                                <span class="slider round"></span>
-                            </label>
+                        </div>
+                        <div class="themes-grid">
+                            <div class="theme-circle" data-theme-id="midnight" onclick="setAppTheme('midnight')" style="background: linear-gradient(135deg, #0e121a, #8c72f2);" title="Midnight Purple"></div>
+                            <div class="theme-circle" data-theme-id="aurora" onclick="setAppTheme('aurora')" style="background: linear-gradient(135deg, #0b1411, #10b981);" title="Aurora Green"></div>
+                            <div class="theme-circle" data-theme-id="nordic" onclick="setAppTheme('nordic')" style="background: linear-gradient(135deg, #2e3440, #88c0d0);" title="Nordic Blue"></div>
+                            <div class="theme-circle" data-theme-id="rosegold" onclick="setAppTheme('rosegold')" style="background: linear-gradient(135deg, #1e1115, #fda4af);" title="Rose Gold"></div>
+                            <div class="theme-circle" data-theme-id="light" onclick="setAppTheme('light')" style="background: linear-gradient(135deg, #f0f2f5, #6366f1);" title="Pure Light"></div>
+                            <div class="theme-circle" data-theme-id="onyx" onclick="setAppTheme('onyx')" style="background: linear-gradient(135deg, #000000, #fbbf24);" title="Onyx Black"></div>
                         </div>
                     </div>
 

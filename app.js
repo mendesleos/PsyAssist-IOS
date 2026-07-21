@@ -31,7 +31,7 @@ if ('serviceWorker' in navigator) {
 // Global state container
 let state = {
     drName: "Dr. Bruno",
-    theme: "dark",
+    theme: "midnight",
     patients: [],
     appointments: [],
     selectedDate: new Date(), // Current selected date on calendar
@@ -119,7 +119,7 @@ function saveState() {
 
 function resetToDefaultState() {
     state.drName = "Dr. Bruno";
-    state.theme = "dark";
+    state.theme = "midnight";
     state.patients = JSON.parse(JSON.stringify(DEFAULT_PATIENTS));
     
     // Seed appointments dynamically relative to today
@@ -158,8 +158,7 @@ function resetDatabase() {
 // Initial renders
 function initApp() {
     // Theme setup
-    document.body.className = state.theme === "dark" ? "dark-theme" : "light-theme";
-    document.getElementById("theme-toggle").checked = state.theme === "dark";
+    document.body.setAttribute('data-theme', state.theme);
 
     // Set greeting/header text
     document.getElementById("dr-name-display").textContent = state.drName;
@@ -202,13 +201,14 @@ function initApp() {
     switchTab("inicio");
 }
 
+function setAppTheme(themeId) {
+    state.theme = themeId;
+    document.body.setAttribute('data-theme', themeId);
+    saveState();
+}
+
 function setupEventListeners() {
-    // Theme toggle
-    document.getElementById("theme-toggle").addEventListener("change", (e) => {
-        state.theme = e.target.checked ? "dark" : "light";
-        document.body.className = state.theme === "dark" ? "dark-theme" : "light-theme";
-        saveState();
-    });
+    // Theme is now handled by setAppTheme()
 
     // Settings Button removed from header - avatar now triggers the tab directly
 
