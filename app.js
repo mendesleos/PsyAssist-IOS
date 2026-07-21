@@ -658,6 +658,8 @@ function initChatFlowAgendar() {
     const box = document.getElementById("chat-messages");
     box.innerHTML = "";
     chatState = {};
+    chatHistory = [];
+    updateChatBackButton();
 
     chatAddUserMessage("Quero agendar uma consulta.");
     chatAddBotMessage("Com certeza! 😊 É para um paciente existente ou vou cadastrar um novo?", 400).then(() => {
@@ -923,6 +925,8 @@ function initChatFlowAtualizarConsulta() {
     const box = document.getElementById("chat-messages");
     box.innerHTML = "";
     chatState = {};
+    chatHistory = [];
+    updateChatBackButton();
 
     chatAddUserMessage("Atualizar Consulta");
     chatAddBotMessage("De qual paciente você deseja atualizar as informações da consulta?", 400).then(() => {
@@ -1076,6 +1080,8 @@ function initChatFlowCancelarConsulta() {
     const box = document.getElementById("chat-messages");
     box.innerHTML = "";
     chatState = {};
+    chatHistory = [];
+    updateChatBackButton();
 
     chatAddUserMessage("Cancelar Consulta");
     chatAddBotMessage("De qual paciente você deseja cancelar a consulta?", 400).then(() => {
@@ -1200,6 +1206,8 @@ function initChatFlowAdicionarPaciente() {
     const box = document.getElementById("chat-messages");
     box.innerHTML = "";
     chatState = {};
+    chatHistory = [];
+    updateChatBackButton();
 
     chatAddUserMessage("Adicionar Paciente");
     chatAddBotMessage("Vamos cadastrar um novo paciente! Qual o <strong>nome completo</strong> dele?", 400).then(() => {
@@ -1320,6 +1328,8 @@ function initChatFlowRemoverPaciente() {
     const box = document.getElementById("chat-messages");
     box.innerHTML = "";
     chatState = {};
+    chatHistory = [];
+    updateChatBackButton();
 
     chatAddUserMessage("Remover Paciente");
     chatAddBotMessage("Qual paciente você deseja <strong>remover do sistema</strong>?", 400).then(() => {
@@ -1394,6 +1404,8 @@ function initChatFlowPagamento() {
     const box = document.getElementById("chat-messages");
     box.innerHTML = "";
     chatState = {};
+    chatHistory = [];
+    updateChatBackButton();
 
     chatAddUserMessage("Registrar Pagamento");
     chatAddBotMessage("De qual paciente você deseja atualizar o status financeiro?", 400).then(() => {
