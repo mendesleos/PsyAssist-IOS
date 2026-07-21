@@ -143,7 +143,7 @@ body {
     transition: background-color var(--transition-speed);
 }
 
-body.light-theme .mobile-frame {
+body[data-theme="light"] .mobile-frame {
     border-color: #e5e7eb;
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
 }
@@ -352,7 +352,7 @@ body.light-theme .mobile-frame {
     width: calc(50% - 6px);
 }
 
-body.light-theme .secondary-action {
+body[data-theme="light"] .secondary-action {
     background-color: white;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
@@ -440,7 +440,7 @@ body.light-theme .secondary-action {
     transition: background 0.2s;
 }
 
-body.light-theme .chat-close-btn {
+body[data-theme="light"] .chat-close-btn {
     background: rgba(0, 0, 0, 0.05);
 }
 
@@ -512,7 +512,7 @@ body.light-theme .chat-close-btn {
     transition: background-color 0.2s;
 }
 
-body.light-theme .chat-option-btn {
+body[data-theme="light"] .chat-option-btn {
     background-color: white;
 }
 
@@ -537,7 +537,7 @@ body.light-theme .chat-option-btn {
     outline: none;
 }
 
-body.light-theme .chat-input-row input {
+body[data-theme="light"] .chat-input-row input {
     background-color: white;
 }
 
@@ -623,7 +623,7 @@ body.light-theme .chat-input-row input {
     text-align: center;
 }
 
-body.light-theme .chat-slot-btn {
+body[data-theme="light"] .chat-slot-btn {
     background-color: white;
 }
 
@@ -696,7 +696,7 @@ body.light-theme .chat-slot-btn {
     min-width: 60px;
 }
 
-body.light-theme .appt-time-badge {
+body[data-theme="light"] .appt-time-badge {
     background-color: rgba(0, 0, 0, 0.03);
 }
 
@@ -841,7 +841,7 @@ body.light-theme .appt-time-badge {
     background-color: rgba(255,255,255,0.04);
 }
 
-body.light-theme .cal-day:hover {
+body[data-theme="light"] .cal-day:hover {
     background-color: rgba(0,0,0,0.04);
 }
 
@@ -994,7 +994,7 @@ body.light-theme .cal-day:hover {
     border: 1px solid var(--border-color);
 }
 
-body.light-theme .patient-toggle-group {
+body[data-theme="light"] .patient-toggle-group {
     background-color: rgba(0, 0, 0, 0.03);
 }
 
@@ -1030,9 +1030,9 @@ body.light-theme .patient-toggle-group {
     width: 100%;
 }
 
-body.light-theme .form-group select,
-body.light-theme .form-group input,
-body.light-theme .form-group textarea {
+body[data-theme="light"] .form-group select,
+body[data-theme="light"] .form-group input,
+body[data-theme="light"] .form-group textarea {
     background-color: rgba(255, 255, 255, 0.9);
 }
 
@@ -1498,7 +1498,7 @@ input:checked + .slider:before {
     width: 100%;
     /* Altura base + safe area do iOS (home bar de gestos) */
     height: calc(var(--nav-height) + env(safe-area-inset-bottom));
-    background-color: rgba(21, 25, 35, 0.8);
+    background-color: var(--card-bg);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px); /* Safari fix */
     border-top: 1px solid var(--border-color);
@@ -1507,10 +1507,6 @@ input:checked + .slider:before {
     align-items: flex-start; /* Alinha ao topo para a home bar ficar abaixo */
     padding: 10px 10px env(safe-area-inset-bottom) 10px;
     z-index: 20;
-}
-
-body.light-theme .bottom-nav {
-    background-color: rgba(255, 255, 255, 0.85);
 }
 
 .nav-item {
@@ -1560,7 +1556,7 @@ body.light-theme .bottom-nav {
     box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-body.light-theme .center-nav-circle {
+body[data-theme="light"] .center-nav-circle {
     background-color: rgba(0, 0, 0, 0.03);
 }
 
@@ -1661,7 +1657,7 @@ body.light-theme .center-nav-circle {
     font-size: 0.95rem;
 }
 
-body.light-theme .profile-edit-input {
+body[data-theme="light"] .profile-edit-input {
     background-color: rgba(0, 0, 0, 0.03);
 }
 
@@ -1752,7 +1748,7 @@ body.light-theme .profile-edit-input {
     transition: all 0.2s;
 }
 
-body.light-theme .scan-btn {
+body[data-theme="light"] .scan-btn {
     background-color: rgba(0,0,0,0.03);
 }
 
@@ -1810,7 +1806,7 @@ body.light-theme .scan-btn {
     position: relative;
 }
 
-body.light-theme .timeline-date-group {
+body[data-theme="light"] .timeline-date-group {
     border-left-color: rgba(0,0,0,0.06);
 }
 
@@ -1908,7 +1904,7 @@ body.light-theme .timeline-date-group {
     outline: none;
 }
 
-body.light-theme .edit-note-textarea {
+body[data-theme="light"] .edit-note-textarea {
     background-color: #ffffff;
 }
 
@@ -1979,7 +1975,7 @@ body.light-theme .edit-note-textarea {
     outline: none;
 }
 
-body.light-theme .inline-note-editor input {
+body[data-theme="light"] .inline-note-editor input {
     background-color: #ffffff;
 }
 
