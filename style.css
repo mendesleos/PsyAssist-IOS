@@ -2116,6 +2116,7 @@ body[data-theme="light"] .inline-note-editor input {
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid var(--border-color);
+    overflow: hidden;
     transition: transform var(--transition-speed), border-color var(--transition-speed);
 }
 
