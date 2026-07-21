@@ -2103,24 +2103,26 @@ body[data-theme="light"] .inline-note-editor input {
 }
 /* Themes Grid em Ajustes */
 .themes-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
     padding-top: 10px;
+    justify-content: flex-start;
 }
 
 .theme-circle {
-    aspect-ratio: 1;
-    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
     cursor: pointer;
     border: 2px solid var(--border-color);
     transition: transform var(--transition-speed), border-color var(--transition-speed);
 }
 
 .theme-circle:hover {
-    transform: scale(1.05);
+    transform: scale(1.1);
 }
 
 .theme-circle:active {
-    transform: scale(0.95);
+    transform: scale(0.9);
 }
