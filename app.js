@@ -1344,16 +1344,8 @@ function chatStep_Remover_ProcessPatient(patient) {
     ).then(() => {
         chatAddOptions([
             { label: "🗑️ Sim, remover paciente", action: () => chatStep_Remover_Save() },
-            { label: "✏️ Editar informações", action: () => chatStep_EditRemover() }
-        ]);
-    });
-}
-
-function chatStep_EditRemover() {
-    chatAddBotMessage("O que você deseja alterar?", 400).then(() => {
-        chatAddOptions([
-            { label: "👤 Paciente", action: () => {
-                chatAddUserMessage("Paciente");
+            { label: "👤 Escolher outro paciente", action: () => {
+                chatAddUserMessage("Escolher outro paciente");
                 chatAddBotMessage("Qual paciente você deseja <strong>remover do sistema</strong>?", 400).then(() => {
                     chatAddSearchInput("Buscar paciente...", chatStep_Remover_ProcessPatient);
                 });
@@ -1361,6 +1353,8 @@ function chatStep_EditRemover() {
         ]);
     });
 }
+
+// Removida chatStep_EditRemover() pois agora a opção Escolher outro paciente faz isso direto
 
 function chatStep_Remover_Save() {
     chatAddUserMessage("Sim, remover paciente");
@@ -1384,6 +1378,7 @@ function chatStep_Remover_Save() {
         700
     ).then(() => {
         chatAddOptions([
+            { label: "🗑️ Remover outro paciente", action: () => initChatFlowRemoverPaciente() },
             { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
         ]);
     });
