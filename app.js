@@ -1146,7 +1146,15 @@ function chatStep_Cancelar_Confirmar(appt) {
         if (appts.length === 1) {
             chatAddOptions([
                 { label: "🗑️ Sim, cancelar consulta", action: () => chatStep_Cancelar_Save() },
-                { label: "❌ Não cancelar", action: () => closeGuidedChat() }
+                { label: "❌ Não cancelar", action: () => {
+                    chatAddUserMessage("Não cancelar");
+                    chatAddBotMessage("Tudo bem, a consulta foi mantida. O que deseja fazer agora?", 400).then(() => {
+                        chatAddOptions([
+                            { label: "👤 Escolher outro paciente", action: () => initChatFlowCancelarConsulta() },
+                            { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
+                        ]);
+                    });
+                }}
             ]);
         } else {
             chatAddOptions([
