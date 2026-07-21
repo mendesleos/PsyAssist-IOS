@@ -437,10 +437,10 @@ let chatState = {};
 let chatHistory = [];
 
 function updateChatBackButton() {
-    const btn = document.getElementById("chat-back-btn");
+    const btn = document.getElementById("chat-undo-container");
     if (btn) {
         if (chatHistory.length > 0) {
-            btn.style.display = "flex";
+            btn.style.display = "block";
         } else {
             btn.style.display = "none";
         }

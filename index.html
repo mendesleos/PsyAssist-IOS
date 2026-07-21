@@ -374,7 +374,7 @@
             <div id="guided-chat-overlay" class="chat-overlay" style="display: none;">
                 <div class="chat-header">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <button id="chat-back-btn" class="chat-back-btn" onclick="chatGoBack()" style="display: none;">
+                        <button class="chat-back-btn" onclick="closeGuidedChat()">
                             <i class="fa-solid fa-arrow-left"></i>
                         </button>
                         <div class="chat-header-info">
@@ -382,12 +382,14 @@
                             <span>PsyAssist IA</span>
                         </div>
                     </div>
-                    <button class="chat-close-btn" onclick="closeGuidedChat()">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
                 </div>
-                <div class="chat-messages" id="chat-messages">
+                <div class="chat-messages" id="chat-messages" style="flex: 1; overflow-y: auto;">
                     <!-- Messages will be injected here by JS -->
+                </div>
+                <div id="chat-undo-container" style="display: none; padding: 16px; background: var(--card-bg); border-top: 1px solid var(--border-color);">
+                    <button onclick="chatGoBack()" style="color: var(--danger-color); background: none; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; transition: opacity 0.2s;">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> Voltar uma ação
+                    </button>
                 </div>
             </div>
 
