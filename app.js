@@ -458,6 +458,13 @@ function switchTab(tabId) {
         }
     }
 
+    // Resetar estados das abas
+    state.selectedDate = new Date();
+    state.currentMonthYear = new Date();
+    state.financeiroMonthYear = new Date();
+    const searchPatients = document.getElementById("search-patients");
+    if (searchPatients) searchPatients.value = "";
+
     // Perform specific updates per tab
     if (tabId === "calendario") {
         renderCalendar();
