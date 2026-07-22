@@ -299,13 +299,8 @@ function handleLogout() {
 }
 
 function openMicrophoneSettings() {
-    // Tenta abrir as configurações do iOS.
-    // Em PWAs no iOS, o link App-Prefs pode redirecionar para o app Ajustes.
-    try {
-        window.location.href = 'App-Prefs:root';
-    } catch (e) {
-        alert("Para permitir o uso do microfone:\n\n1. Abra o aplicativo 'Ajustes' do iPhone\n2. Role até encontrar o Safari\n3. Toque em 'Microfone' e mude para 'Permitir'");
-    }
+    // Safari blocked or permission denied. We must instruct the user.
+    alert("Para permitir o uso do microfone:\n\n1. Abra o aplicativo 'Ajustes' do iPhone\n2. Role até encontrar o Safari\n3. Toque em 'Microfone' e mude para 'Permitir'");
     
     // Fallback após um curto tempo caso o redirecionamento silencioso falhe
     setTimeout(() => {
