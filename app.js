@@ -2439,18 +2439,6 @@ function openPatientModalById(patientId) {
 
     // Set payment pending list
     const modalAppts = state.appointments.filter(a => a.patientId === patientId);
-    const pendingAppts = modalAppts.filter(a => !a.paid);
-    const paymentListEl = document.getElementById("modal-payment-pending-list");
-    
-    if (pendingAppts.length > 0) {
-        const datesStr = pendingAppts.map(a => formatDateBR(a.date)).join(", ");
-        const label = pendingAppts.length === 1 ? "Pagamento Pendente:" : "Pagamentos Pendentes:";
-        paymentListEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${label} ${datesStr}`;
-        paymentListEl.style.display = "block";
-    } else {
-        paymentListEl.style.display = "none";
-    }
-
     // Render historical records
     renderPatientTimeline(patientId);
 
