@@ -35,7 +35,9 @@ let state = {
     patients: [],
     appointments: [],
     selectedDate: new Date(), // Current selected date on calendar
-    currentMonthYear: new Date() // Month/Year currently viewed on calendar
+    currentMonthYear: new Date(), // Month/Year currently viewed on calendar
+    financeiroMonthYear: new Date(), // Month viewed in Financeiro
+    sessionPrice: 30 // Preço padrão da clínica
 };
 
 // Função utilitária de busca (apenas match no início do nome ou sobrenome)
@@ -403,9 +405,24 @@ function switchTab(tabId) {
     const headerLeft = document.getElementById("dynamic-header-left");
     if (headerLeft) {
         if (tabId === "inicio") {
-            headerLeft.classList.remove("hidden");
+            headerLeft.innerHTML = `
+                <div style="font-size: 0.85rem; opacity: 0.8;">Bom dia,</div>
+                <h2 style="font-weight: 700; font-size: 1.4rem;">${state.drName}</h2>
+            `;
+        } else if (tabId === "calendario") {
+            headerLeft.innerHTML = `
+                <h2 style="font-weight: 700; font-size: 1.4rem;">${state.drName}</h2>
+                <div style="font-size: 0.85rem; opacity: 0.8;">Sua Agenda</div>
+            `;
+        } else if (tabId === "financeiro") {
+            headerLeft.innerHTML = `
+                <h2 style="font-weight: 700; font-size: 1.4rem;">${state.drName}</h2>
+                <div style="font-size: 0.85rem; opacity: 0.8;">Painel Financeiro</div>
+            `;
         } else {
-            headerLeft.classList.add("hidden");
+            headerLeft.innerHTML = `
+                <h2 style="font-weight: 700; font-size: 1.4rem;">${state.drName}</h2>
+            `;
         }
     }
 
@@ -425,6 +442,8 @@ function switchTab(tabId) {
         renderTodayAppointments();
     } else if (tabId === "pacientes") {
         renderPatientsList();
+    } else if (tabId === "financeiro") {
+        renderFinanceiro();
     }
 }
 
@@ -3078,5 +3097,117 @@ function processAICommand(text) {
         renderCalendar();
         renderPatientsList();
         updatePatientDropdown();
+    }
+}
+
+// ==========================================
+// FINANCEIRO MODULE
+// ==========================================
+
+function changeFinanceiroMonth(offset) {
+    state.financeiroMonthYear.setMonth(state.financeiroMonthYear.getMonth() + offset);
+    saveState();
+    renderFinanceiro();
+}
+
+function renderFinanceiro() {
+    // 1. Month Label
+    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const m = state.financeiroMonthYear.getMonth();
+    const y = state.financeiroMonthYear.getFullYear();
+    document.getElementById("financeiro-month-label").textContent = `${monthNames[m]} ${y}`;
+
+    // 2. Filter Appointments for this month
+    const apptsInMonth = state.appointments.filter(appt => {
+        const d = new Date(appt.date);
+        const parts = appt.date.split("-");
+        const apptYear = parseInt(parts[0], 10);
+        const apptMonth = parseInt(parts[1], 10) - 1; // 0-indexed
+        return apptYear === y && apptMonth === m;
+    });
+
+    const totalPrevisto = apptsInMonth.length * state.sessionPrice;
+    const paidAppts = apptsInMonth.filter(a => a.paid);
+    const totalRecebido = paidAppts.length * state.sessionPrice;
+    const progressPercent = totalPrevisto === 0 ? 0 : (totalRecebido / totalPrevisto) * 100;
+
+    document.getElementById("financeiro-recebido-val").textContent = totalRecebido.toFixed(2).replace('.', ',');
+    document.getElementById("financeiro-previsto-val").textContent = totalPrevisto.toFixed(2).replace('.', ',');
+    document.getElementById("financeiro-progress-bar").style.width = `${progressPercent}%`;
+
+    // 3. Render Pending Patients List
+    const pendingAppts = apptsInMonth.filter(a => !a.paid);
+    const listContainer = document.getElementById("financeiro-pendentes-list");
+    
+    if (pendingAppts.length === 0) {
+        listContainer.innerHTML = `
+            <div class="empty-state" id="financeiro-empty-state">
+                <div style="font-size: 3rem; margin-bottom: 12px;">💰</div>
+                <p>Nenhum paciente ativo para<br>cobrança neste mês.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Group pending appointments by patient
+    const grouped = {};
+    pendingAppts.forEach(appt => {
+        if (!grouped[appt.patientId]) {
+            grouped[appt.patientId] = {
+                patientName: appt.patientName,
+                appts: []
+            };
+        }
+        grouped[appt.patientId].appts.push(appt);
+    });
+
+    let html = "";
+    Object.keys(grouped).forEach(pid => {
+        const pData = grouped[pid];
+        const patientTotal = pData.appts.length * state.sessionPrice;
+        
+        let apptsHtml = pData.appts.map(a => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                <div>
+                    <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">
+                        <i class="fa-regular fa-calendar" style="color: var(--accent-color); margin-right: 6px;"></i>
+                        ${a.date.split('-').reverse().join('/')} às ${a.time}
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">Valor: R$ ${state.sessionPrice.toFixed(2).replace('.', ',')}</div>
+                </div>
+                <button class="action-btn primary-action" style="padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; cursor: pointer;" onclick="markFinanceiroPaid('${a.id}')">
+                    Dar Baixa
+                </button>
+            </div>
+        `).join("");
+
+        html += `
+            <details class="faq-item" style="margin-bottom: 12px;">
+                <summary style="padding: 16px; display: flex; justify-content: space-between; align-items: center; background: var(--surface-color); cursor: pointer;">
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-weight: 600; color: var(--text-primary); font-size: 1.05rem;">${pData.patientName}</span>
+                        <span style="font-size: 0.85rem; color: var(--danger-color); margin-top: 4px;">Pendente: R$ ${patientTotal.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                </summary>
+                <div style="padding: 0 16px 16px 16px; background: var(--bg-color);">
+                    ${apptsHtml}
+                </div>
+            </details>
+        `;
+    });
+
+    listContainer.innerHTML = html;
+}
+
+function markFinanceiroPaid(apptId) {
+    const appt = state.appointments.find(a => a.id === apptId);
+    if (appt) {
+        appt.paid = true;
+        saveState();
+        renderFinanceiro(); // re-render immediate update
+        
+        // Update views se necessário
+        renderTodayAppointments();
+        renderSelectedDayAppointments();
     }
 }

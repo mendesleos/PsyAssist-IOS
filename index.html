@@ -364,32 +364,34 @@
                 </div>
 
                 <div class="financeiro-month-selector">
-                    <button class="icon-btn"><i class="fa-solid fa-chevron-left"></i></button>
-                    <span>Julho 2026</span>
-                    <button class="icon-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                    <button class="icon-btn" onclick="changeFinanceiroMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <span id="financeiro-month-label">Julho 2026</span>
+                    <button class="icon-btn" onclick="changeFinanceiroMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
 
                 <div class="financeiro-card">
                     <div class="financeiro-card-header">RECEBIDO NO MÊS</div>
-                    <div class="financeiro-card-main">R$ <span style="font-size: 2.2rem; font-weight: 700;">0,00</span></div>
+                    <div class="financeiro-card-main">R$ <span id="financeiro-recebido-val" style="font-size: 2.2rem; font-weight: 700;">0,00</span></div>
                     
                     <div class="financeiro-progress-bg">
-                        <div class="financeiro-progress-fill" style="width: 0%;"></div>
+                        <div id="financeiro-progress-bar" class="financeiro-progress-fill" style="width: 0%;"></div>
                     </div>
                     
                     <div class="financeiro-card-footer">
                         <div>
                             <div class="financeiro-label">Total Previsto</div>
-                            <div class="financeiro-value">R$ 0,00</div>
+                            <div class="financeiro-value">R$ <span id="financeiro-previsto-val">0,00</span></div>
                         </div>
                     </div>
                 </div>
 
                 <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; margin-top: 30px;">Controle de Pacientes</h3>
 
-                <div class="empty-state">
-                    <div style="font-size: 3rem; margin-bottom: 12px;">💰</div>
-                    <p>Nenhum paciente ativo para<br>cobrança neste mês.</p>
+                <div id="financeiro-pendentes-list">
+                    <div class="empty-state" id="financeiro-empty-state">
+                        <div style="font-size: 3rem; margin-bottom: 12px;">💰</div>
+                        <p>Nenhum paciente ativo para<br>cobrança neste mês.</p>
+                    </div>
                 </div>
             </section>
 
