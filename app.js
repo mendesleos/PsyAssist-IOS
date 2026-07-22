@@ -362,6 +362,7 @@ function handleDndToggle(checkbox) {
             animation: fadeIn 0.3s ease;
         `;
         document.body.appendChild(msg);
+        
         setTimeout(() => msg.remove(), 2500);
     }
 }
@@ -373,6 +374,14 @@ function openTermsModal() {
 
 function closeTermsModal() {
     document.getElementById("terms-modal").classList.remove("active");
+}
+
+function openFaqModal() {
+    document.getElementById("faq-modal").classList.add("active");
+}
+
+function closeFaqModal() {
+    document.getElementById("faq-modal").classList.remove("active");
 }
 
 // Navigation / Tab Switch Router

@@ -2138,3 +2138,51 @@ body[data-theme="light"] .inline-note-editor input {
     box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--text-primary);
     transform: scale(1.05);
 }
+
+/* FAQ Styles */
+.faq-body {
+    padding-top: 10px;
+}
+
+.faq-item {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.faq-item summary {
+    padding: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none; /* Hide default arrow in some browsers */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-primary);
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item summary::after {
+    content: '+';
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
+}
+
+.faq-item[open] summary::after {
+    transform: rotate(45deg);
+}
+
+.faq-item p {
+    padding: 0 16px 16px 16px;
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
