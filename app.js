@@ -280,8 +280,9 @@ function handleAvatarChange(event) {
 // SETTINGS FUNCTIONS
 
 function handleLogout() {
-    if (confirm("Deseja realmente sair? Seus dados salvos neste dispositivo serão apagados.")) {
-        localStorage.clear();
+    if (confirm("Deseja encerrar a sessão? Seus pacientes e prontuários continuarão salvos com segurança neste dispositivo.")) {
+        // Apenas recarrega a página para simular o logout visualmente sem apagar dados locais.
+        // Em um app offline real com sistema de autenticação, removeríamos apenas o token de sessão aqui.
         location.reload();
     }
 }
