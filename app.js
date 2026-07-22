@@ -413,6 +413,8 @@ function startGuidedChat(action) {
         initChatFlowRemoverPaciente();
     } else if (action === 'pagamento') {
         initChatFlowPagamento();
+    } else if (action === 'salvar_prontuario_voz') {
+        initChatFlowSalvarProntuarioVoz();
     } else {
         // Mocked para outras ações
         const chatBox = document.getElementById("chat-messages");
@@ -576,7 +578,7 @@ function chatAddSearchInput(placeholder, onSelect) {
     setTimeout(() => input.focus(), 300);
 }
 
-function chatAddTextInput(placeholder, type, onConfirm) {
+function chatAddTextInput(placeholder, type, onConfirm, enableMic = false) {
     const box = document.getElementById("chat-messages");
     const row = document.createElement("div");
     row.className = "chat-input-row";
@@ -609,6 +611,47 @@ function chatAddTextInput(placeholder, type, onConfirm) {
     input.addEventListener("keypress", e => { if (e.key === "Enter") submit(); });
 
     row.appendChild(input);
+
+    if (enableMic) {
+        const micBtn = document.createElement("button");
+        micBtn.id = "chat-mic-btn";
+        micBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
+        
+        micBtn.onclick = () => {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Seu navegador não suporta ditado de voz.");
+                return;
+            }
+            
+            micBtn.classList.add("recording-pulse");
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'pt-BR';
+            recognition.interimResults = false;
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                input.value = (input.value + " " + transcript).trim();
+                micBtn.classList.remove("recording-pulse");
+                input.focus();
+            };
+            
+            recognition.onerror = function(event) {
+                micBtn.classList.remove("recording-pulse");
+                if (event.error === 'not-allowed') {
+                    alert("Acesso ao microfone negado.");
+                }
+            };
+            
+            recognition.onend = function() {
+                micBtn.classList.remove("recording-pulse");
+            };
+            
+            recognition.start();
+        };
+        row.appendChild(micBtn);
+    }
+
     row.appendChild(btn);
     box.appendChild(row);
     box.scrollTop = box.scrollHeight;
@@ -1507,6 +1550,145 @@ function chatStep_Pagamento_Save(paidStatus) {
     chatState = {};
 }
 
+// ============================================================
+// FLUXO: SALVAR PRONTUÁRIO POR VOZ
+// ============================================================
+
+function initChatFlowSalvarProntuarioVoz() {
+    const box = document.getElementById("chat-messages");
+    box.innerHTML = "";
+    chatState = {};
+    chatHistory = [];
+    updateChatBackButton();
+
+    chatAddUserMessage("Salvar Prontuário por Voz");
+    chatAddBotMessage("De qual paciente você deseja salvar o prontuário/observações?", 400).then(() => {
+        chatAddSearchInput("Buscar paciente...", (patient) => {
+            chatState.patientId = patient.id;
+            chatState.patientName = patient.name;
+            chatAddUserMessage(patient.name);
+
+            const appts = state.appointments.filter(a => a.patientId === patient.id);
+
+            if (appts.length === 0) {
+                chatAddBotMessage(`<strong>${patient.name}</strong> não possui consultas vinculadas para adicionar prontuário.`, 400).then(() => {
+                    chatAddOptions([
+                        { label: "👤 Escolher outro paciente", action: () => initChatFlowSalvarProntuarioVoz() },
+                        { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
+                    ]);
+                });
+                return;
+            }
+
+            // Pede para selecionar a consulta
+            chatAddBotMessage(
+                `De qual consulta de <strong>${patient.name}</strong> o(a) Dr(a) quer salvar as informações?`,
+                400
+            ).then(() => {
+                const sorted = [...appts].sort((a, b) => {
+                    if (a.date !== b.date) return b.date.localeCompare(a.date); // Decrescente (mais recentes primeiro)
+                    return b.time.localeCompare(a.time);
+                });
+                chatAddOptions(
+                    sorted.map(appt => ({
+                        label: `📅 ${formatDateBR(appt.date)} às ${appt.time}`,
+                        action: () => {
+                            chatAddUserMessage(`${formatDateBR(appt.date)} às ${appt.time}`);
+                            chatStep_Voz_PedirRelato(appt);
+                        }
+                    }))
+                );
+            });
+        });
+    });
+}
+
+function chatStep_Voz_PedirRelato(appt) {
+    chatState.apptForNotes = appt;
+    chatAddBotMessage(
+        `Pode começar a falar! 🎙️<br><br>Clique no ícone de <strong>Microfone</strong> abaixo para ditar, ou digite se preferir. Ao terminar, clique em enviar.`,
+        500
+    ).then(() => {
+        chatAddTextInput("Comece a falar ou digitar...", "text", (text) => {
+            chatState.draftNotes = text;
+            chatAddUserMessage(text);
+            chatStep_Voz_ConfirmarOuEditar();
+        }, true); // enableMic = true
+    });
+}
+
+function chatStep_Voz_ConfirmarOuEditar() {
+    chatAddBotMessage(
+        `Entendido! O que deseja fazer com esse relato?`,
+        500
+    ).then(() => {
+        chatAddOptions([
+            {
+                label: "✅ Confirmar (Salvar no Prontuário)",
+                action: () => chatStep_Voz_Salvar(chatState.draftNotes)
+            },
+            {
+                label: "✏️ Editar observações",
+                action: () => {
+                    chatAddUserMessage("Editar observações");
+                    chatAddBotMessage("Edite o texto abaixo e envie novamente:", 400).then(() => {
+                        chatAddTextInput("Edite o texto...", "text", (newText) => {
+                            chatState.draftNotes = newText;
+                            chatAddUserMessage(newText);
+                            chatStep_Voz_ConfirmarOuEditar();
+                        }, true); // enableMic = true
+
+                        // Inject old text into input
+                        setTimeout(() => {
+                            const inputs = document.querySelectorAll('.chat-input-row input[type="text"]');
+                            if (inputs.length > 0) {
+                                inputs[inputs.length - 1].value = chatState.draftNotes;
+                            }
+                        }, 50);
+                    });
+                }
+            }
+        ]);
+    });
+}
+
+function chatStep_Voz_Salvar(finalText) {
+    chatAddUserMessage("Confirmar");
+
+    const appt = chatState.apptForNotes;
+    const records = JSON.parse(localStorage.getItem("psyassist_records") || "{}");
+    if (!records[appt.patientId]) records[appt.patientId] = [];
+
+    let group = records[appt.patientId].find(g => g.date === appt.date);
+    if (!group) {
+        group = { date: appt.date, notes: [] };
+        records[appt.patientId].push(group);
+    }
+    
+    // Anexa a nota ao histórico
+    group.notes.push(finalText);
+    localStorage.setItem("psyassist_records", JSON.stringify(records));
+
+    // Se estiver na aba do paciente, força um re-render silencioso
+    if (activeModalPatientId === appt.patientId) {
+        renderPatientTimeline(appt.patientId);
+    }
+
+    chatAddBotMessage(
+        `✅ <strong>Prontuário Salvo com Sucesso!</strong><br><br>` +
+        `As anotações foram registradas na ficha de ${chatState.patientName} na data ${formatDateBR(appt.date)}.`,
+        700
+    ).then(() => {
+        chatAddBotMessage(`Deseja fazer observação de alguma outra consulta ou voltar ao início?`, 600).then(() => {
+            chatAddOptions([
+                { label: "📝 Outra consulta", action: () => initChatFlowSalvarProntuarioVoz() },
+                { label: "🏠 Voltar ao início", action: () => closeGuidedChat() }
+            ]);
+        });
+    });
+
+    chatState = {};
+}
 // Expõe função global para o HTML
 window.chatSelectPatientType = function(type) {
     if (type === "existing") chatStep_ExistingPatient();

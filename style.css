@@ -340,6 +340,16 @@ body[data-theme="light"] .mobile-frame {
     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
 }
 
+.voice-action {
+    grid-column: span 2;
+    flex-direction: row;
+    font-size: 1rem;
+    padding: 18px;
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
 .secondary-action {
     background-color: rgba(255, 255, 255, 0.05);
     color: var(--text-primary);
@@ -556,6 +566,36 @@ body[data-theme="light"] .chat-input-row input {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+}
+
+#chat-mic-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+}
+
+body[data-theme="light"] #chat-mic-btn {
+    background-color: white;
+}
+
+.recording-pulse {
+    background-color: var(--danger-color) !important;
+    color: white !important;
+    animation: pulseMic 1.5s infinite;
+}
+
+@keyframes pulseMic {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
 /* Chat Search Input for existing patient */
