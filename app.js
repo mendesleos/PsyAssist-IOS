@@ -3233,31 +3233,6 @@ function updateFinanceiroTotals(patientIdToUpdate) {
             } else {
                 pendenteSpan.textContent = `Tudo Pago`;
                 pendenteSpan.style.color = "#10B981"; // green
-                
-                const detailsEl = document.getElementById(`patient-accordion-${patientIdToUpdate}`);
-                if (detailsEl) {
-                    setTimeout(() => {
-                        detailsEl.style.transition = "opacity 0.4s ease, height 0.4s ease, margin 0.4s ease";
-                        detailsEl.style.opacity = "0";
-                        detailsEl.style.height = "0";
-                        detailsEl.style.margin = "0";
-                        detailsEl.style.overflow = "hidden";
-                        setTimeout(() => {
-                            detailsEl.remove();
-                            
-                            // Check if list is empty
-                            const listContainer = document.getElementById("financeiro-pendentes-list");
-                            if (listContainer && listContainer.querySelectorAll("details").length === 0) {
-                                listContainer.innerHTML = `
-                                    <div class="empty-state" id="financeiro-empty-state" style="animation: fadeIn 0.4s ease-out;">
-                                        <div style="font-size: 3rem; margin-bottom: 12px;">💰</div>
-                                        <p>Nenhum paciente ativo para<br>cobrança neste mês.</p>
-                                    </div>
-                                `;
-                            }
-                        }, 400);
-                    }, 1200);
-                }
             }
         }
     }
