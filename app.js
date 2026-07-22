@@ -2051,7 +2051,7 @@ function handleAddAppointment(e) {
     // PREVENÇÃO DE CONFLITO DE HORÁRIOS (Double Booking)
     const conflito = state.appointments.find(a => a.date === date && a.time === time);
     if (conflito) {
-        alert(`Conflito de horário!\n\nJá existe uma consulta marcada com ${conflito.patientName} às ${time} neste dia.\nPor favor, escolha outro horário.`);
+        openConflictModal(`Já existe uma consulta com <strong>${conflito.patientName}</strong> às ${time} neste dia.<br>Por favor, escolha outro horário.`);
         return;
     }
 
@@ -2339,6 +2339,13 @@ function saveAppointmentEdits() {
         return;
     }
     
+    // VERIFICAR CONFLITO DE HORÁRIO NA EDIÇÃO
+    const conflict = state.appointments.find(a => a.id !== activeAppointmentId && a.date === newDate && a.time === newTime);
+    if (conflict) {
+        openConflictModal(`O horário das ${newTime} já está reservado para <strong>${conflict.patientName}</strong>.<br>Por favor, escolha outro horário para a consulta.`);
+        return;
+    }
+    
     appt.date = newDate;
     appt.time = newTime;
     
@@ -2372,6 +2379,15 @@ function confirmDeleteAppointment() {
     renderTodayAppointments();
     renderSelectedDayAppointments();
     renderCalendar();
+}
+
+function openConflictModal(message) {
+    document.getElementById("conflict-modal-message").innerHTML = message;
+    document.getElementById("conflict-modal").classList.add("active");
+}
+
+function closeConflictModal() {
+    document.getElementById("conflict-modal").classList.remove("active");
 }
 function openPatientModalById(patientId) {
     const patient = state.patients.find(p => p.id === patientId);
