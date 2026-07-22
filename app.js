@@ -401,6 +401,10 @@ function switchTab(tabId) {
     const activeBtn = document.getElementById(`nav-${tabId}`);
     if (activeBtn) activeBtn.classList.add("active");
 
+    // Scroll to Top
+    const mainContent = document.getElementById("main-content");
+    if (mainContent) mainContent.scrollTop = 0;
+
     // Lógica do Cabeçalho Dinâmico
     const headerLeft = document.getElementById("dynamic-header-left");
     if (headerLeft) {
