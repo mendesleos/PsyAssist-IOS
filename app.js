@@ -2497,38 +2497,41 @@ function confirmDeleteDate() {
     closeConfirmDeleteModal();
 }
 
-// CEREJA DO BOLO 1: NOTEBOOK OCR SCANNER
-function triggerNotebookScan() {
-    // Open file chooser trigger
-    document.getElementById("notebook-photo-input").click();
-}
+// CEREJA DO BOLO 1: SPEECH TO TEXT DICTATION
+function startDictation() {
+    if (!activeModalPatientId) return;
 
-function simulateOCR(event) {
-    if (!activeModalPatientId || !event.target.files.length) return;
+    // Check browser support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Ops! Seu navegador/sistema não suporta reconhecimento de voz nativo. Tente atualizar o Safari ou usar o Chrome.");
+        return;
+    }
 
-    const scanner = document.getElementById("ocr-scanner");
-    scanner.style.display = "block"; // Show scanner animation
+    const btn = document.getElementById("voice-dictation-btn");
+    const originalHTML = btn.innerHTML;
+    const originalBg = btn.style.background;
 
-    // Clean file input to let them upload same file again later
-    const fileInput = event.target.value;
+    // UI feedback
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Ouvindo... (Fale agora)';
+    btn.style.background = 'var(--danger-color)';
+    btn.style.color = '#fff';
 
-    setTimeout(() => {
-        // Hide scanner
-        scanner.style.display = "none";
-        document.getElementById("notebook-photo-input").value = "";
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-        // Simulated OCR text options matching patient case study profiles (without "Digitalizado..." prefix)
-        const ocrSamples = [
-            "Paciente relata sentimentos recorrentes de angústia social. Discutiu episódios de isolamento autoimposto. Orientado a manter diário de humor.",
-            "Progresso na organização de prioridades. Mencionou conflito com o chefe, mas soube lidar de forma assertiva utilizando a técnica de CNV (comunicação não-violenta).",
-            "Apresenta ansiedade somatizada em dores no estômago. Trabalhamos respiração diafragmática profunda em sessão. Recomendada continuação.",
-            "Paciente demonstrou forte reatividade emocional a críticas. Exploração de crenças nucleares de rejeição na infância. Próximo passo: reestruturação cognitiva."
-        ];
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        
+        // Reset UI
+        btn.innerHTML = originalHTML;
+        btn.style.background = originalBg;
 
-        // Pick random clinical sample note
-        const randomNote = ocrSamples[Math.floor(Math.random() * ocrSamples.length)];
+        if (transcript.trim() === "") return;
+
         const todayStr = formatDateISO(new Date());
-
         const records = JSON.parse(localStorage.getItem("psyassist_records") || "{}");
         if (!records[activeModalPatientId]) records[activeModalPatientId] = [];
 
@@ -2540,20 +2543,46 @@ function simulateOCR(event) {
             renderPatientTimeline(activeModalPatientId);
         }
 
-        // Não salvar automaticamente! Apenas injetar no input de edição
         const inputEl = document.getElementById(`input-${todayStr}`);
         if (!inputEl) {
-            // Se o editor ainda não estiver renderizado por algum motivo
             renderPatientTimeline(activeModalPatientId);
         }
         
         openInlineNoteEditor(todayStr);
         const newInputEl = document.getElementById(`input-${todayStr}`);
         if (newInputEl) {
-            newInputEl.value = randomNote;
+            // Se já tiver texto, adiciona um espaço e a nova gravação. Se não, só a gravação.
+            const currentText = newInputEl.value.trim();
+            newInputEl.value = currentText ? `${currentText} ${transcript}` : transcript;
             newInputEl.focus();
         }
-    }, 2800); // 2.8 seconds scan animation
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Speech recognition error", event.error);
+        btn.innerHTML = originalHTML;
+        btn.style.background = originalBg;
+        
+        if (event.error === 'not-allowed') {
+            alert("O acesso ao microfone foi negado. Verifique os Ajustes do iPhone para permitir o microfone para este app.");
+        } else {
+            alert("Não consegui te ouvir direito. Tente novamente!");
+        }
+    };
+
+    recognition.onend = function() {
+        // Reset UI in case it ends without result or error
+        btn.innerHTML = originalHTML;
+        btn.style.background = originalBg;
+    }
+
+    try {
+        recognition.start();
+    } catch (e) {
+        console.error("Recognition already started or failed", e);
+        btn.innerHTML = originalHTML;
+        btn.style.background = originalBg;
+    }
 }
 
 // CEREJA DO BOLO 2: AI VOICE/TEXT COMMAND PARSER (NLP SIMULATOR)

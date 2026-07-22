@@ -427,17 +427,9 @@
                 <!-- Historical Sessions / Digitalizer OCR Section -->
                 <div class="session-records-header">
                     <h3>Registro de Anotações Clínicas</h3>
-                    <button class="scan-btn" onclick="triggerNotebookScan()">
-                        <i class="fa-solid fa-camera"></i> Digitalizar Caderno
+                    <button class="scan-btn" id="voice-dictation-btn" onclick="startDictation()">
+                        <i class="fa-solid fa-microphone"></i> Gravar Prontuário por Voz
                     </button>
-                    <!-- Hidden file inputs to simulate photo upload -->
-                    <input type="file" id="notebook-photo-input" accept="image/*" style="display: none;" onchange="simulateOCR(event)">
-                </div>
-
-                <!-- Scanning Animation Laser (Hidden by default) -->
-                <div class="ocr-scanning-overlay" id="ocr-scanner" style="display: none;">
-                    <div class="laser-beam"></div>
-                    <div class="scanning-text"><i class="fa-solid fa-spinner fa-spin"></i> Digitalizando caderno...</div>
                 </div>
 
                 <!-- Dynamic Notebook entries grouped by date -->
