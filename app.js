@@ -3177,7 +3177,7 @@ function renderFinanceiro() {
                     </div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">Valor: R$ ${state.sessionPrice.toFixed(2).replace('.', ',')}</div>
                 </div>
-                <button id="btn-baixa-${a.id}" class="action-btn primary-action" style="padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease;" onclick="markFinanceiroPaid('${a.id}', '${pid}')">
+                <button id="btn-baixa-${a.id}" class="action-btn primary-action" style="padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease;" onclick="toggleFinanceiroPaid('${a.id}', '${pid}')">
                     Dar Baixa
                 </button>
             </div>
@@ -3230,6 +3230,7 @@ function updateFinanceiroTotals(patientIdToUpdate) {
         if (pendenteSpan) {
             if (patientTotal > 0) {
                 pendenteSpan.textContent = `Pendente: R$ ${patientTotal.toFixed(2).replace('.', ',')}`;
+                pendenteSpan.style.color = "var(--danger-color)";
             } else {
                 pendenteSpan.textContent = `Tudo Pago`;
                 pendenteSpan.style.color = "#10B981"; // green
@@ -3238,11 +3239,14 @@ function updateFinanceiroTotals(patientIdToUpdate) {
     }
 }
 
-function markFinanceiroPaid(apptId, patientId) {
+function toggleFinanceiroPaid(apptId, patientId) {
     let updated = false;
+    let newState = null;
+    
     state.appointments.forEach(a => {
-        if (a.id === apptId && !a.paid) {
-            a.paid = true;
+        if (a.id === apptId) {
+            a.paid = !a.paid;
+            newState = a.paid;
             updated = true;
         }
     });
@@ -3253,11 +3257,17 @@ function markFinanceiroPaid(apptId, patientId) {
         // Success Animation on Button
         const btn = document.getElementById(`btn-baixa-${apptId}`);
         if (btn) {
-            btn.innerHTML = `<i class="fa-solid fa-check"></i> Pago`;
-            btn.style.background = "#10B981";
-            btn.style.borderColor = "#10B981";
-            btn.style.color = "white";
-            btn.style.pointerEvents = "none";
+            if (newState) {
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> Pago`;
+                btn.style.background = "#10B981";
+                btn.style.borderColor = "#10B981";
+                btn.style.color = "white";
+            } else {
+                btn.innerHTML = `Dar Baixa`;
+                btn.style.background = "";
+                btn.style.borderColor = "";
+                btn.style.color = "";
+            }
         }
 
         updateFinanceiroTotals(patientId);
