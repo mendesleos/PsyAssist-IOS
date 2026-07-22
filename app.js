@@ -287,6 +287,21 @@ function handleLogout() {
     }
 }
 
+function openMicrophoneSettings() {
+    // Tenta abrir as configurações do iOS.
+    // Em PWAs no iOS, o link App-Prefs pode redirecionar para o app Ajustes.
+    try {
+        window.location.href = 'App-Prefs:root';
+    } catch (e) {
+        alert("Para permitir o uso do microfone:\n\n1. Abra o aplicativo 'Ajustes' do iPhone\n2. Role até encontrar o Safari\n3. Toque em 'Microfone' e mude para 'Permitir'");
+    }
+    
+    // Fallback após um curto tempo caso o redirecionamento silencioso falhe
+    setTimeout(() => {
+        alert("Se os Ajustes não abriram automaticamente:\n\n1. Abra os 'Ajustes' do iPhone\n2. Procure por Safari > Microfone\n3. Selecione 'Permitir'");
+    }, 2000);
+}
+
 function handleDeleteAccount() {
     const first = confirm("⚠️ ATENÇÃO: Esta ação é irreversível!\n\nTodos os seus dados (pacientes, consultas, configurações) serão permanentemente excluídos.\n\nDeseja continuar?");
     if (!first) return;
