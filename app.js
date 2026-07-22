@@ -298,14 +298,33 @@ function handleLogout() {
     }
 }
 
-function openMicrophoneSettings() {
-    // Safari blocked or permission denied. We must instruct the user.
-    openMicPermissionModal();
-    
-    // Fallback após um curto tempo caso o redirecionamento silencioso falhe
-    setTimeout(() => {
-        alert("Se os Ajustes não abriram automaticamente:\n\n1. Abra os 'Ajustes' do iPhone\n2. Procure por Safari > Microfone\n3. Selecione 'Permitir'");
-    }, 2000);
+async function openMicrophoneSettings() {
+    try {
+        // Tenta capturar o microfone
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Se sucesso, para as tracks imediatamente e mostra modal de sucesso
+        stream.getTracks().forEach(track => track.stop());
+        openMicSuccessModal();
+    } catch (err) {
+        // Se erro (negado ou sem permissão), mostra modal de instruções
+        openMicPermissionModal();
+    }
+}
+
+function openMicPermissionModal() {
+    document.getElementById("mic-permission-modal").classList.add("active");
+}
+
+function closeMicPermissionModal() {
+    document.getElementById("mic-permission-modal").classList.remove("active");
+}
+
+function openMicSuccessModal() {
+    document.getElementById("mic-success-modal").classList.add("active");
+}
+
+function closeMicSuccessModal() {
+    document.getElementById("mic-success-modal").classList.remove("active");
 }
 
 function handleDeleteAccount() {
