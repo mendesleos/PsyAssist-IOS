@@ -722,7 +722,9 @@ function chatAddTextInput(placeholder, type, onConfirm, enableMic = false) {
             recognition.onerror = function(event) {
                 micBtn.classList.remove("recording-pulse");
                 if (event.error === 'not-allowed') {
-                    alert("Acesso ao microfone negado.");
+                    openMicPermissionModal();
+                } else if (event.error === 'no-speech') {
+                    showToast("Nenhuma fala detectada.");
                 }
             };
             
@@ -2833,9 +2835,11 @@ function startDictation() {
         btn.style.background = originalBg;
         
         if (event.error === 'not-allowed') {
-            alert("O acesso ao microfone foi negado. Verifique os Ajustes do iPhone para permitir o microfone para este app.");
+            openMicPermissionModal();
+        } else if (event.error === 'no-speech') {
+            showToast("Nenhuma fala detectada. Tente falar mais perto do microfone.");
         } else {
-            alert("Não consegui te ouvir direito. Tente novamente!");
+            showToast("Erro na captação de voz (" + event.error + "). Tente novamente.");
         }
     };
 
