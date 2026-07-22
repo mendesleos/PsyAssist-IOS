@@ -2122,15 +2122,8 @@ body[data-theme="light"] .inline-note-editor input {
     height: 44px;
     border-radius: 50%;
     cursor: pointer;
-    border: 3px solid transparent;
     box-shadow: 0 0 0 2px var(--border-color);
-    overflow: hidden;
     transition: transform var(--transition-speed), box-shadow var(--transition-speed);
-    
-    /* Correções p/ Safari/Webkit não vazar o fundo quadrado nas diagonais */
-    background-clip: padding-box;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
 }
 
 .theme-circle:hover {
@@ -2142,6 +2135,6 @@ body[data-theme="light"] .inline-note-editor input {
 }
 
 .theme-circle.selected-theme {
-    box-shadow: 0 0 0 3px var(--bg-color), 0 0 0 5px var(--text-primary);
-    transform: scale(1.1);
+    box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--text-primary);
+    transform: scale(1.05);
 }
