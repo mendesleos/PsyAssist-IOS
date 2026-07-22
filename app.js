@@ -419,6 +419,11 @@ function switchTab(tabId) {
                 <h2 style="font-weight: 700; font-size: 1.4rem;">${state.drName}</h2>
                 <div style="font-size: 0.85rem; opacity: 0.8;">Painel Financeiro</div>
             `;
+        } else if (tabId === "pacientes") {
+            headerLeft.innerHTML = `
+                <h2 style="font-weight: 700; font-size: 1.4rem;">${state.drName}</h2>
+                <div style="font-size: 0.85rem; opacity: 0.8;">Seus Pacientes</div>
+            `;
         } else {
             headerLeft.innerHTML = `
                 <h2 style="font-weight: 700; font-size: 1.4rem;">${state.drName}</h2>
