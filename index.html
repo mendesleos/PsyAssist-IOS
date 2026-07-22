@@ -577,6 +577,37 @@
         </div>
     </div>
 
+    <!-- Modal Conflito de Horário -->
+    <div class="modal-overlay" id="conflict-modal">
+        <div class="modal-content" style="max-width: 350px; text-align: center; background: var(--bg-color); border-radius: 20px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+            <div style="font-size: 3rem; color: var(--danger-color); margin-bottom: 12px;">
+                <i class="fa-solid fa-calendar-xmark"></i>
+            </div>
+            <h3 style="margin-bottom: 12px; color: var(--text-primary);">Horário Ocupado</h3>
+            <p id="conflict-modal-message" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 24px;">
+                <!-- mensagem dinâmica -->
+            </p>
+            <button class="action-btn primary-action" onclick="closeConflictModal()" style="width: 100%;">Entendi</button>
+        </div>
+    </div>
+
+    <!-- Modal Permissão de Microfone -->
+    <div class="modal-overlay" id="mic-permission-modal">
+        <div class="modal-content" style="max-width: 350px; text-align: center; background: var(--bg-color); border-radius: 20px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+            <div style="font-size: 3rem; color: var(--accent-color); margin-bottom: 12px;">
+                <i class="fa-solid fa-microphone-slash"></i>
+            </div>
+            <h3 style="margin-bottom: 12px; color: var(--text-primary);">Acesso ao Microfone</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 24px; text-align: left; line-height: 1.5;">
+                O Safari bloqueou o uso do microfone. Para liberar:<br><br>
+                <strong>1.</strong> Abra o app <b>Ajustes</b> do seu iPhone<br>
+                <strong>2.</strong> Role até encontrar o <b>Safari</b><br>
+                <strong>3.</strong> Role até <b>Microfone</b> e marque <b>Permitir</b>
+            </p>
+            <button class="action-btn primary-action" onclick="closeMicPermissionModal()" style="width: 100%;">Entendi</button>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="app.js"></script>
 </body>

@@ -300,7 +300,7 @@ function handleLogout() {
 
 function openMicrophoneSettings() {
     // Safari blocked or permission denied. We must instruct the user.
-    alert("Para permitir o uso do microfone:\n\n1. Abra o aplicativo 'Ajustes' do iPhone\n2. Role até encontrar o Safari\n3. Toque em 'Microfone' e mude para 'Permitir'");
+    openMicPermissionModal();
     
     // Fallback após um curto tempo caso o redirecionamento silencioso falhe
     setTimeout(() => {
