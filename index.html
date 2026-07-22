@@ -542,17 +542,17 @@
                 <button class="close-modal-btn" onclick="closeAppointmentModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
-                <div style="display: flex; gap: 8px;">
-                    <div style="flex: 1;">
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div>
                         <label style="font-size: 0.8rem; color: var(--text-secondary);">Data</label>
                         <input type="date" id="appt-modal-date" class="profile-edit-input" style="width: 100%;">
                     </div>
-                    <div style="flex: 1;">
+                    <div>
                         <label style="font-size: 0.8rem; color: var(--text-secondary);">Horário</label>
-                        <div style="display: flex; gap: 4px; align-items: center;">
-                            <select id="appt-modal-hour" class="profile-edit-input" style="flex: 1; padding: 12px 4px; text-align: center;"></select>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <select id="appt-modal-hour" class="profile-edit-input" style="flex: 1; text-align: center; padding: 12px;"></select>
                             <span style="font-weight: 600; color: var(--text-primary);">:</span>
-                            <select id="appt-modal-minute" class="profile-edit-input" style="flex: 1; padding: 12px 4px; text-align: center;"></select>
+                            <select id="appt-modal-minute" class="profile-edit-input" style="flex: 1; text-align: center; padding: 12px;"></select>
                         </div>
                     </div>
                 </div>
