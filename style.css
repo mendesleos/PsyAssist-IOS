@@ -314,10 +314,10 @@ body[data-theme="light"] .mobile-frame {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 8px;
-    padding: 16px 10px;
+    gap: 6px;
+    padding: 12px 10px;
     border-radius: 16px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     text-align: center;
     cursor: pointer;
@@ -368,7 +368,7 @@ body[data-theme="light"] .secondary-action {
 }
 
 .action-btn i {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 /* Guided Chat UI Overlay */
@@ -1678,7 +1678,7 @@ body[data-theme="light"] .center-nav-circle {
     border: 1px solid var(--border-color);
     border-radius: 18px;
     padding: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
 }
 
 .profile-info-box p {
@@ -1763,9 +1763,10 @@ body[data-theme="light"] .profile-edit-input {
 /* Session Notebook Scan & Add Notes */
 .session-records-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 24px;
 }
 
 .session-records-header h3 {
@@ -1803,7 +1804,7 @@ body[data-theme="light"] .scan-btn {
 .records-timeline {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
 }
 
 .timeline-date-group {
@@ -2112,14 +2113,14 @@ body[data-theme="light"] .inline-note-editor input {
 .themes-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
     padding-top: 10px;
     justify-content: flex-start;
 }
 
 .theme-circle {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 0 0 2px var(--border-color);
