@@ -306,7 +306,7 @@ body[data-theme="light"] .mobile-frame {
 .assistant-actions-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
 }
 
 .action-btn {
@@ -314,10 +314,10 @@ body[data-theme="light"] .mobile-frame {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 6px;
-    padding: 12px 10px;
-    border-radius: 16px;
-    font-size: 0.8rem;
+    gap: 4px;
+    padding: 10px 8px;
+    border-radius: 14px;
+    font-size: 0.75rem;
     font-weight: 600;
     text-align: center;
     cursor: pointer;
@@ -351,9 +351,10 @@ body[data-theme="light"] .mobile-frame {
 }
 
 .secondary-action {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.08);
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .centered-secondary-action {
