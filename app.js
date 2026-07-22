@@ -158,7 +158,7 @@ function resetDatabase() {
 // Initial renders
 function initApp() {
     // Theme setup
-    document.body.setAttribute('data-theme', state.theme);
+    setAppTheme(state.theme);
 
     // Set greeting/header text
     document.getElementById("dr-name-display").textContent = state.drName;
@@ -205,6 +205,15 @@ function setAppTheme(themeId) {
     state.theme = themeId;
     document.body.setAttribute('data-theme', themeId);
     saveState();
+    
+    // Atualiza a UI para mostrar qual está selecionado
+    document.querySelectorAll('.theme-circle').forEach(circle => {
+        if (circle.getAttribute('data-theme-id') === themeId) {
+            circle.classList.add('selected-theme');
+        } else {
+            circle.classList.remove('selected-theme');
+        }
+    });
 }
 
 function setupEventListeners() {
