@@ -3162,7 +3162,9 @@ function renderFinanceiro() {
     });
 
     let html = "";
-    Object.keys(grouped).forEach(pid => {
+    const sortedKeys = Object.keys(grouped).sort((a, b) => grouped[a].patientName.localeCompare(grouped[b].patientName));
+    
+    sortedKeys.forEach(pid => {
         const pData = grouped[pid];
         const patientTotal = pData.appts.length * state.sessionPrice;
         
@@ -3175,18 +3177,18 @@ function renderFinanceiro() {
                     </div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">Valor: R$ ${state.sessionPrice.toFixed(2).replace('.', ',')}</div>
                 </div>
-                <button class="action-btn primary-action" style="padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; cursor: pointer;" onclick="markFinanceiroPaid('${a.id}')">
+                <button id="btn-baixa-${a.id}" class="action-btn primary-action" style="padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease;" onclick="markFinanceiroPaid('${a.id}', '${pid}')">
                     Dar Baixa
                 </button>
             </div>
         `).join("");
 
         html += `
-            <details class="faq-item" style="margin-bottom: 12px;">
+            <details id="patient-accordion-${pid}" class="faq-item" style="margin-bottom: 12px;">
                 <summary style="padding: 16px; display: flex; justify-content: space-between; align-items: center; background: var(--surface-color); cursor: pointer;">
                     <div style="display: flex; flex-direction: column;">
                         <span style="font-weight: 600; color: var(--text-primary); font-size: 1.05rem;">${pData.patientName}</span>
-                        <span style="font-size: 0.85rem; color: var(--danger-color); margin-top: 4px;">Pendente: R$ ${patientTotal.toFixed(2).replace('.', ',')}</span>
+                        <span id="pendente-text-${pid}" style="font-size: 0.85rem; color: var(--danger-color); margin-top: 4px; transition: color 0.3s;">Pendente: R$ ${patientTotal.toFixed(2).replace('.', ',')}</span>
                     </div>
                 </summary>
                 <div style="padding: 0 16px 16px 16px; background: var(--bg-color);">
@@ -3199,7 +3201,69 @@ function renderFinanceiro() {
     listContainer.innerHTML = html;
 }
 
-function markFinanceiroPaid(apptId) {
+function updateFinanceiroTotals(patientIdToUpdate) {
+    const m = state.financeiroMonthYear.getMonth();
+    const y = state.financeiroMonthYear.getFullYear();
+    const apptsInMonth = state.appointments.filter(appt => {
+        const parts = appt.date.split("-");
+        return parseInt(parts[0], 10) === y && (parseInt(parts[1], 10) - 1) === m;
+    });
+
+    const totalPrevisto = apptsInMonth.length * state.sessionPrice;
+    const paidAppts = apptsInMonth.filter(a => a.paid);
+    const totalRecebido = paidAppts.length * state.sessionPrice;
+    const progressPercent = totalPrevisto === 0 ? 0 : (totalRecebido / totalPrevisto) * 100;
+
+    const recebidoEl = document.getElementById("financeiro-recebido-val");
+    if (recebidoEl) recebidoEl.textContent = totalRecebido.toFixed(2).replace('.', ',');
+    const previstoEl = document.getElementById("financeiro-previsto-val");
+    if (previstoEl) previstoEl.textContent = totalPrevisto.toFixed(2).replace('.', ',');
+    const progEl = document.getElementById("financeiro-progress-bar");
+    if (progEl) progEl.style.width = `${progressPercent}%`;
+
+    if (patientIdToUpdate) {
+        const pendingAppts = apptsInMonth.filter(a => !a.paid);
+        const patientPending = pendingAppts.filter(a => a.patientId === patientIdToUpdate);
+        const patientTotal = patientPending.length * state.sessionPrice;
+        const pendenteSpan = document.getElementById(`pendente-text-${patientIdToUpdate}`);
+        
+        if (pendenteSpan) {
+            if (patientTotal > 0) {
+                pendenteSpan.textContent = `Pendente: R$ ${patientTotal.toFixed(2).replace('.', ',')}`;
+            } else {
+                pendenteSpan.textContent = `Tudo Pago`;
+                pendenteSpan.style.color = "#10B981"; // green
+                
+                const detailsEl = document.getElementById(`patient-accordion-${patientIdToUpdate}`);
+                if (detailsEl) {
+                    setTimeout(() => {
+                        detailsEl.style.transition = "opacity 0.4s ease, height 0.4s ease, margin 0.4s ease";
+                        detailsEl.style.opacity = "0";
+                        detailsEl.style.height = "0";
+                        detailsEl.style.margin = "0";
+                        detailsEl.style.overflow = "hidden";
+                        setTimeout(() => {
+                            detailsEl.remove();
+                            
+                            // Check if list is empty
+                            const listContainer = document.getElementById("financeiro-pendentes-list");
+                            if (listContainer && listContainer.querySelectorAll("details").length === 0) {
+                                listContainer.innerHTML = `
+                                    <div class="empty-state" id="financeiro-empty-state" style="animation: fadeIn 0.4s ease-out;">
+                                        <div style="font-size: 3rem; margin-bottom: 12px;">💰</div>
+                                        <p>Nenhum paciente ativo para<br>cobrança neste mês.</p>
+                                    </div>
+                                `;
+                            }
+                        }, 400);
+                    }, 1200);
+                }
+            }
+        }
+    }
+}
+
+function markFinanceiroPaid(apptId, patientId) {
     let updated = false;
     state.appointments.forEach(a => {
         if (a.id === apptId && !a.paid) {
@@ -3210,9 +3274,20 @@ function markFinanceiroPaid(apptId) {
 
     if (updated) {
         saveState();
-        renderFinanceiro(); // re-render immediate update
         
-        // Update views se necessário
+        // Success Animation on Button
+        const btn = document.getElementById(`btn-baixa-${apptId}`);
+        if (btn) {
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> Pago`;
+            btn.style.backgroundColor = "#10B981";
+            btn.style.borderColor = "#10B981";
+            btn.style.color = "white";
+            btn.style.pointerEvents = "none";
+        }
+
+        updateFinanceiroTotals(patientId);
+        
+        // Update views silenciosamente
         renderTodayAppointments();
         renderSelectedDayAppointments();
     }
