@@ -3279,7 +3279,7 @@ function markFinanceiroPaid(apptId, patientId) {
         const btn = document.getElementById(`btn-baixa-${apptId}`);
         if (btn) {
             btn.innerHTML = `<i class="fa-solid fa-check"></i> Pago`;
-            btn.style.backgroundColor = "#10B981";
+            btn.style.background = "#10B981";
             btn.style.borderColor = "#10B981";
             btn.style.color = "white";
             btn.style.pointerEvents = "none";
