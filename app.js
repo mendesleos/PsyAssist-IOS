@@ -3200,9 +3200,15 @@ function renderFinanceiro() {
 }
 
 function markFinanceiroPaid(apptId) {
-    const appt = state.appointments.find(a => a.id === apptId);
-    if (appt) {
-        appt.paid = true;
+    let updated = false;
+    state.appointments.forEach(a => {
+        if (a.id === apptId && !a.paid) {
+            a.paid = true;
+            updated = true;
+        }
+    });
+
+    if (updated) {
         saveState();
         renderFinanceiro(); // re-render immediate update
         
